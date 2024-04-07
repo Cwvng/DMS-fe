@@ -11,18 +11,22 @@ function App() {
       <ConfigProvider
         theme={{
           hashed: false,
+
           components: {
             Layout: { colorBgBase: '#ee2121' },
             Menu: {
               iconSize: 20,
               collapsedIconSize: 15,
               itemSelectedBg: 'rgba(228,35,56,0.11)',
-              itemSelectedColor: '#e42338',
+              itemSelectedColor: '#ee0033',
               itemColor: '#a1a0a0'
+            },
+            Button: {
+              fontWeight: 500
             }
           },
           token: {
-            colorPrimary: '#e42338'
+            colorPrimary: '#ee0033'
           }
         }}>
         <BrowserRouter>

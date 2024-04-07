@@ -21,8 +21,9 @@ module.exports = {
           "url('https://birchtree.me/content/images/size/w2000/2020/08/DB0B3B0A-1888-41AB-B044-AB24A90229CE..jpeg')"
       },
       colors: {
-        primary: '#e42338',
-        secondary: '#3E5B76'
+        primary: '#ee0033',
+        secondary: '#3E5B76',
+        hoverBg: 'rgba(228,35,56,0.11)'
       }
     }
   },
