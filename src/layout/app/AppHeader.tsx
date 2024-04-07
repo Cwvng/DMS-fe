@@ -42,7 +42,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ toggleSidebar }) => {
           onClick={toggleSidebar}
           icon={<IoIosMenu className="text-2xl text-gray-700" />}
         />
-        <h2 className="text-primary">Viettel DMS</h2>
+        <h2 className="text-primary">Database Migration Service</h2>
       </div>
       <div className="flex gap-3">
         <Button

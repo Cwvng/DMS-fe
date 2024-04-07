@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { SelectInfo } from 'rc-menu/lib/interface';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TfiMenuAlt } from 'react-icons/tfi';
-import { MdOutlineAccountTree } from 'react-icons/md';
-import { BiGlobe } from 'react-icons/bi';
 import { FaShareNodes } from 'react-icons/fa6';
 
 interface SidebarProps {
@@ -47,22 +45,11 @@ export const AppSidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       label: <span className="font-semibold ">Migration jobs</span>,
       icon: <TfiMenuAlt />
     },
-    {
-      key: '/conversion-workspaces',
-      label: <span className="font-semibold ">Conversion workspaces</span>,
-      icon: <MdOutlineAccountTree />
-    },
 
     {
       key: '/connection-profiles',
       label: <span className="font-semibold ">Connection profiles</span>,
       icon: <FaShareNodes />
-    },
-
-    {
-      key: '/private-connectivity',
-      label: <span className="font-semibold ">Private connectivity</span>,
-      icon: <BiGlobe />
     }
   ];
 
