@@ -7,7 +7,7 @@ interface IAppLayout {
   children: any;
 }
 export const AppLayout: React.FC<IAppLayout> = ({ children }) => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
 
   const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
   return (
@@ -15,7 +15,7 @@ export const AppLayout: React.FC<IAppLayout> = ({ children }) => {
       <AppHeader toggleSidebar={toggleSidebar} />
       <Layout>
         <AppSidebar collapsed={isSidebarCollapsed} />
-        <Layout.Content>{children}</Layout.Content>
+        <Layout.Content className="bg-white font-semibold">{children}</Layout.Content>
       </Layout>
     </Layout>
   );
