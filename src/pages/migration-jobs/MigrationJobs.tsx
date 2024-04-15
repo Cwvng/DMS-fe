@@ -16,11 +16,6 @@ export const MigrationJobs: React.FC = () => {
       key: '1',
       label: 'JOBS',
       children: <JobsTable />
-    },
-    {
-      key: '2',
-      label: 'DRAFT',
-      children: 'Content of Tab Pane 2'
     }
   ];
   return (
@@ -32,17 +27,17 @@ export const MigrationJobs: React.FC = () => {
         <Col span={20}>
           <div className="flex gap-2 justify-start">
             <DMSButton icon={<FaPlusSquare />} type="text" title="CREATE MIGRATION JOB" />
-            <DMSButton icon={<FaPlay />} type="text" title="START" />
-            <DMSButton icon={<FaSquare />} type="text" title="STOP" />
-            <DMSButton icon={<BsBootstrapReboot />} type="text" title="RESTART" />
-            <DMSButton icon={<GrResume />} type="text" title="RESUME" />
-            <DMSButton icon={<FaTrash />} type="text" title="DELETE" />
+            <DMSButton disabled icon={<FaPlay />} type="text" title="START" />
+            <DMSButton disabled icon={<FaSquare />} type="text" title="STOP" />
+            <DMSButton disabled icon={<BsBootstrapReboot />} type="text" title="RESTART" />
+            <DMSButton disabled icon={<GrResume />} type="text" title="RESUME" />
+            <DMSButton disabled icon={<FaTrash />} type="text" title="DELETE" />
           </div>
         </Col>
       </Row>
       <Row className="p-5">
         <div className="font-normal">
-          Migration jobs allow you to move data between source and destination databases
+          Migration jobs allow you to move data from source to destination databases
         </div>
       </Row>
       <div className="px-5">

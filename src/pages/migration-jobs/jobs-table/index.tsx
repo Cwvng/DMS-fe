@@ -1,5 +1,6 @@
 import { Table, TableProps, Tag } from 'antd';
 import React from 'react';
+import { FaEllipsisV } from 'react-icons/fa';
 
 interface DataType {
   key: string;
@@ -7,6 +8,7 @@ interface DataType {
   status: string;
   phase: string;
   src: string;
+  destination: string;
 }
 
 const getStatusTagColor = (status: string): string => {
@@ -56,6 +58,17 @@ const columns: TableProps<DataType>['columns'] = [
     key: 'src',
     dataIndex: 'src',
     render: (text: string) => <a>{text}</a>
+  },
+  {
+    title: 'Destination ID',
+    key: 'destination',
+    dataIndex: 'destination',
+    render: (text: string) => <a>{text}</a>
+  },
+  {
+    key: 'action',
+    dataIndex: 'action',
+    render: () => <FaEllipsisV />
   }
 ];
 
@@ -65,14 +78,16 @@ const data: DataType[] = [
     name: 'John Brown',
     phase: 'Progress',
     src: 'New York No. 1 Lake Park',
-    status: 'Not started'
+    status: 'Not started',
+    destination: 'example'
   },
   {
     key: '2',
     name: 'John Brown',
     phase: 'Progress',
     src: 'New York No. 1 Lake Park',
-    status: 'Done'
+    status: 'Done',
+    destination: 'example'
   }
 ];
 
