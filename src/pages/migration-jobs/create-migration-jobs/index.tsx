@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Button, Col, Row } from 'antd';
 import React from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -23,10 +23,15 @@ export const CreateMigrationJobs: React.FC = () => {
       <div className="flex flex-1 flex-row">
         <div className="p-5 basis-1/3 border-r-1 border-border">
           <CreateSteps />
+          <div className="mt-3">
+            <Button className="mr-3" type="primary">
+              SAVE AND EXIT
+            </Button>
+            <Button>DISCARD DRAFT</Button>
+          </div>
         </div>
-        <div className="p-5 basis-2/3 ">
-          <span className="text-lg font-bold "> Describe your migration jobs</span>
-          <div className="mt-5">{stepItems[state.step].content}</div>
+        <div className="p-5 basis-2/5 ">
+          <div>{stepItems[state.step].content}</div>
         </div>
       </div>
     </div>

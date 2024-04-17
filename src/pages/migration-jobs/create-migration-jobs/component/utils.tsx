@@ -1,20 +1,19 @@
 import { StepsProps } from 'antd';
-import { GetStarted } from './step/GetStarted.tsx';
+import { GetStarted } from './step-1/GetStarted.tsx';
+import { DefineSource } from './step-2/DefineSource.tsx';
 interface stepItems extends StepsProps {
   content?: React.ReactNode;
 }
 export const stepItems = [
-  { title: 'Get started', description: 'Get started', content: <GetStarted /> },
+  { title: 'Get started', content: <GetStarted /> },
   {
-    title: 'Define a source',
-    description: 'Define a source'
+    title: 'Define a source connection',
+    content: <DefineSource />
   },
   {
-    title: 'Define a destination',
-    description: 'Define a destination'
+    title: 'Define a destination connection'
   },
   {
-    title: 'Test and create migration job',
-    description: 'Test and create migration job'
+    title: 'Test and create migration job'
   }
 ];

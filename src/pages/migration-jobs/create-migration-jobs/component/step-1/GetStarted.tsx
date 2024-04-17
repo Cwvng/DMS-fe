@@ -11,6 +11,7 @@ export const GetStarted: React.FC = () => {
   const dispatch = useDispatch();
   return (
     <>
+      <div className="text-lg font-bold mb-5 "> Describe your migration jobs</div>
       <Form>
         <Form.Item>
           <FloatLabelInput label="Migration job name" name="email" />
@@ -63,8 +64,8 @@ export const GetStarted: React.FC = () => {
         </Form.Item>
       </Form>
       <Modal
-        title="MySQL source"
-        className="w-2/5  m-0 float-right top-0 h-screen "
+        title={<div className="font-semibold text-xl">MySQL source</div>}
+        className="w-2/5  m-0 float-right top-0"
         visible={openModal}
         onOk={() => setOpenModal(false)}
         onCancel={() => setOpenModal(false)}
