@@ -65,7 +65,7 @@ export const GetStarted: React.FC = () => {
       </Form>
       <Modal
         title={<div className="font-semibold text-xl">MySQL source</div>}
-        className="w-2/5  m-0 float-right top-0 h-10 "
+        className="w-2/5  m-0 float-right top-0"
         visible={openModal}
         onOk={() => setOpenModal(false)}
         onCancel={() => setOpenModal(false)}

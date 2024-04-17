@@ -5,7 +5,7 @@ import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput
 
 export const CreateConnectionProfile: React.FC = () => {
   return (
-    <>
+    <div>
       <div>
         Connection profile represent the information required to connect to a data location. Choose
         a database engine and the details needed for that type of connection profile appear{' '}
@@ -45,6 +45,6 @@ export const CreateConnectionProfile: React.FC = () => {
           <FloatLabelInput type="password" label="Password" required />
         </Form.Item>
       </Form>
-    </>
+    </div>
   );
 };

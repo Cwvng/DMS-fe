@@ -93,7 +93,7 @@ export const DefineSource: React.FC = () => {
       <Modal
         title={<div className="font-semibold text-xl">Create connection profile</div>}
         visible={openModal}
-        className="w-2/5  m-0 float-right top-0 h-screen "
+        className="w-2/5  m-0 float-right top-0"
         onCancel={() => setOpenModal(false)}
         onOk={() => setOpenModal(false)}
         okText="CREATE"

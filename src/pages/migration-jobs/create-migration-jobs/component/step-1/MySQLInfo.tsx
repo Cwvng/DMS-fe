@@ -1,6 +1,6 @@
 export const MySQLInfo = () => {
   return (
-    <div>
+    <div className="overflow-auto h-160">
       <div className="font-semibold">MySQL source</div>
       During the initial full dump phase DDL operations on the source may break the migration
       process. Make sure to stop all DDL operations when the migration status changes to Running |
