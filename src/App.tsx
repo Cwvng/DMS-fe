@@ -19,7 +19,8 @@ function App() {
               collapsedIconSize: 15,
               itemSelectedBg: 'rgba(228,35,56,0.11)',
               itemSelectedColor: '#ee0033',
-              itemColor: '#a1a0a0'
+              itemColor: '#a1a0a0',
+              itemHoverColor: '#ee0033'
             },
             Button: {
               fontWeight: 500

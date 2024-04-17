@@ -55,14 +55,14 @@ export const AppSidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 
   return (
     <Layout.Sider
-      className="!bg-white flex flex-col border-1 border-gray-200 border-solid border-t-0"
+      className="!bg-white flex flex-col border-r-1 border-border"
       collapsible
       collapsed={collapsed}
       collapsedWidth={60}
-      width={240}
+      width={200}
       trigger={null}>
       <Menu
-        style={{ minHeight: '100vh' }}
+        className="h-full"
         items={menuItems}
         mode="inline"
         onSelect={handleMenuSelect}

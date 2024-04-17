@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { AppLayout } from '../layout/app/AppLayout.tsx';
 import { MigrationJobs } from './migration-jobs/MigrationJobs.tsx';
 import { ConnectionProfiles } from './connection-profiles/ConnectionProfiles.tsx';
@@ -7,6 +7,7 @@ import { PrivateConnectivity } from './private-connectivity/PrivateConnectivity.
 import { ConversionWorkspaces } from './conversion-workspaces/ConversionWorkspaces.tsx';
 import { Error404 } from '../components/errors/Error404.tsx';
 import { Error403 } from '../components/errors/Error403.tsx';
+import { CreateMigrationJobs } from './migration-jobs/create-migration-jobs';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -32,7 +33,11 @@ export const AppRoutes: React.FC = () => {
             <Outlet />
           </AppLayout>
         }>
-        <Route path="/" element={<MigrationJobs />} />
+        <Route path="/" element={<Navigate to="/migration-jobs" replace={true} />} />
+
+        <Route path="/migration-jobs" element={<MigrationJobs />} />
+        <Route path="/migration-jobs/create" element={<CreateMigrationJobs />} />
+
         <Route path="/connection-profiles" element={<ConnectionProfiles />} />
         <Route path="/private-connectivity" element={<PrivateConnectivity />} />
         <Route path="/conversion-workspaces" element={<ConversionWorkspaces />} />

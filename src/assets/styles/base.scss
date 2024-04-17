@@ -14,8 +14,13 @@ body,
 .app-layout {
   height: 100%;
   margin: 0;
-  overflow-y: hidden;
 }
+
+*, ::before, ::after {
+   border-width: 0;
+   border-style: solid;
+   border-color: currentColor /* or gray-DEFAULT / gray-400 */;
+ }
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
