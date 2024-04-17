@@ -5,8 +5,10 @@ import { FaPlay, FaPlusSquare, FaSquare, FaTrash } from 'react-icons/fa';
 import { BsBootstrapReboot } from 'react-icons/bs';
 import { GrResume } from 'react-icons/gr';
 import { JobsTable } from './jobs-table';
+import { useNavigate } from 'react-router-dom';
 
 export const MigrationJobs: React.FC = () => {
+  const navigate = useNavigate();
   const onChange = (key: string) => {
     console.log(key);
   };
@@ -20,13 +22,18 @@ export const MigrationJobs: React.FC = () => {
   ];
   return (
     <>
-      <Row className="p-5 border-x-0 border-t-0 border-b border-gray-200 border-solid">
+      <Row className="px-5 py-2 border-b-1 border-solid border-border">
         <Col span={4}>
           <span className="text-xl font-bold">Migration jobs</span>
         </Col>
         <Col span={20}>
           <div className="flex gap-2 justify-start">
-            <DMSButton icon={<FaPlusSquare />} type="text" title="CREATE MIGRATION JOB" />
+            <DMSButton
+              icon={<FaPlusSquare />}
+              type="text"
+              title="CREATE MIGRATION JOB"
+              onClick={() => navigate('/migration-jobs/create')}
+            />
             <DMSButton disabled icon={<FaPlay />} type="text" title="START" />
             <DMSButton disabled icon={<FaSquare />} type="text" title="STOP" />
             <DMSButton disabled icon={<BsBootstrapReboot />} type="text" title="RESTART" />

@@ -23,6 +23,10 @@ module.exports = {
       colors: {
         primary: '#ee0033',
         secondary: '#3E5B76',
+        gray: '#a1a0a0',
+
+        border: '#e0e0e0',
+
         hoverBg: 'rgba(228,35,56,0.11)'
       }
     }

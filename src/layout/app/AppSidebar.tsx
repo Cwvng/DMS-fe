@@ -55,7 +55,7 @@ export const AppSidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 
   return (
     <Layout.Sider
-      className="!bg-white flex flex-col border-r border-border"
+      className="!bg-white flex flex-col border-r-1 border-border"
       collapsible
       collapsed={collapsed}
       collapsedWidth={60}

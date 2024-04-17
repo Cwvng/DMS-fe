@@ -35,14 +35,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ toggleSidebar }) => {
     }
   ];
   return (
-    <Header className="bg-white flex flex-row items-center justify-between border-1 border-gray-200 border-solid gap-2 px-4 h-12">
+    <Header className="bg-white flex flex-row items-center justify-between border-b-1 border-border gap-2 px-4 h-12">
       <div className="flex gap-10 flex-row items-center">
         <Button
           className="border-none bg-transparent"
           onClick={toggleSidebar}
           icon={<IoIosMenu className="text-2xl text-gray-700" />}
         />
-        <h2 className="text-primary">HUST WORKSPACE</h2>
+        <h2 className="text-primary hover:cursor-pointer" onClick={() => navigate('/')}>
+          Database Migration Service
+        </h2>
       </div>
       <div className="flex gap-3">
         <Button
