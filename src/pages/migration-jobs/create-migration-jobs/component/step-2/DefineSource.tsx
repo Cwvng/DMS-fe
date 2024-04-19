@@ -1,22 +1,16 @@
-import { Button, Divider, Form, Modal } from 'antd';
+import { Button, Divider, Form } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import React from 'react';
 import { dispatch } from '../../../../../redux/store';
 import { PlusOutlined } from '@ant-design/icons';
 import { CreateConnectionProfile } from './CreateConnectionProfile.tsx';
-import { ConnectionProfile } from './ConnectionProfile.tsx';
-import { ConnectionProfileType } from './type.tsx';
+import { ProfileTable } from '../../../../../components/profile/ProfileTable.tsx';
+import { profile, tableInfo } from './utils.tsx';
+import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 
 export const DefineSource: React.FC = () => {
   const [openModal, setOpenModal] = React.useState(false);
-  const profile: ConnectionProfileType = {
-    name: 'linhnt-source-db',
-    id: 'linhnt-source-db',
-    hostname: '12.2.23.123.1',
-    username: 'root',
-    port: '3306'
-  };
 
   return (
     <>
@@ -79,7 +73,7 @@ export const DefineSource: React.FC = () => {
             )}
           />
         </Form.Item>
-        {profile && <ConnectionProfile profile={profile} />}
+        {profile && <ProfileTable profile={profile} tableInfo={tableInfo} />}
         <Form.Item>
           <Button
             type="primary"
@@ -90,16 +84,15 @@ export const DefineSource: React.FC = () => {
           </Button>
         </Form.Item>
       </Form>
-      <Modal
+      <SideModal
         title={<div className="font-semibold text-xl">Create connection profile</div>}
-        visible={openModal}
-        className="w-2/5  m-0 float-right top-0"
+        open={openModal}
         onCancel={() => setOpenModal(false)}
         onOk={() => setOpenModal(false)}
         okText="CREATE"
         cancelText="CANCEL">
         <CreateConnectionProfile />
-      </Modal>
+      </SideModal>
     </>
   );
 };

@@ -23,7 +23,11 @@ function App() {
               itemHoverColor: '#ee0033'
             },
             Button: {
-              fontWeight: 500
+              fontWeight: 500,
+              defaultBorderColor: '#ee0033',
+              defaultColor: '#ee0033',
+              defaultHoverBg: '#ee0033',
+              defaultHoverColor: '#fff'
             }
           },
           token: {
