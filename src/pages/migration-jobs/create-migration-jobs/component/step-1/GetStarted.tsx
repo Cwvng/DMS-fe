@@ -1,10 +1,11 @@
 import React from 'react';
 import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput.tsx';
-import { Button, Card, Col, Form, Modal, Row } from 'antd';
+import { Button, Card, Col, Form, Row } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
 import { MySQLInfo } from './MySQLInfo.tsx';
 import { useDispatch } from '../../../../../redux/store';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
+import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 
 export const GetStarted: React.FC = () => {
   const [openModal, setOpenModal] = React.useState(false);
@@ -63,10 +64,9 @@ export const GetStarted: React.FC = () => {
           </Button>
         </Form.Item>
       </Form>
-      <Modal
+      <SideModal
         title={<div className="font-semibold text-xl">MySQL source</div>}
-        className="w-2/5  m-0 float-right top-0"
-        visible={openModal}
+        open={openModal}
         onOk={() => setOpenModal(false)}
         onCancel={() => setOpenModal(false)}
         footer={
@@ -75,7 +75,7 @@ export const GetStarted: React.FC = () => {
           </Button>
         }>
         <MySQLInfo />
-      </Modal>
+      </SideModal>
     </>
   );
 };
