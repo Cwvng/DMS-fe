@@ -9,6 +9,9 @@ import { IoNotifications } from '@react-icons/all-files/io5/IoNotifications';
 import { IoMdSettings } from '@react-icons/all-files/io/IoMdSettings';
 import { FaUserCircle } from '@react-icons/all-files/fa/FaUserCircle';
 import { IoIosMenu } from '@react-icons/all-files/io/IoIosMenu';
+import { selectProjectId } from '../../redux/slices/migration-jobs.slice.ts';
+import PrefixSelect from '../../components/input/PrefixSelect.tsx';
+import { FaDiagramProject } from 'react-icons/fa6';
 
 interface AppHeaderProps {
   toggleSidebar: () => void;
@@ -34,6 +37,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ toggleSidebar }) => {
       icon: <RiLogoutBoxRLine />
     }
   ];
+  const onSelectChange = (value: string) => {
+    dispatch(selectProjectId(value));
+  };
   return (
     <Header className="bg-white flex flex-row items-center justify-between border-b-1 border-border gap-2 px-4 h-12">
       <div className="flex gap-10 flex-row items-center">
@@ -45,6 +51,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ toggleSidebar }) => {
         <h2 className="text-primary hover:cursor-pointer" onClick={() => navigate('/')}>
           Database Migration Service
         </h2>
+        <PrefixSelect
+          defaultValue="123"
+          style={{ width: 120 }}
+          prefixIcon={<FaDiagramProject />}
+          onChange={onSelectChange}
+          options={[
+            { value: '123', label: 'Linhnt' },
+            { value: '234', label: 'Quang' },
+            { value: '435', label: 'Linh' }
+          ]}
+        />{' '}
       </div>
       <div className="flex gap-3">
         <Button

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col, Row, Tabs, TabsProps } from 'antd';
 import { DMSButton } from '../../components/button/DMSButton.tsx';
 import { FaPlay, FaPlusSquare, FaSquare, FaTrash } from 'react-icons/fa';
@@ -6,9 +6,17 @@ import { BsBootstrapReboot } from 'react-icons/bs';
 import { GrResume } from 'react-icons/gr';
 import { JobsTable } from './jobs-table';
 import { useNavigate } from 'react-router-dom';
+import { getAllJobs } from '../../requests/job.request.ts';
+import { Loading } from '../../components/loading/Loading.tsx';
+import { JobResponse } from '../../requests/types/job.interface.ts';
+import { AppState, useSelector } from '../../redux/store';
 
 export const MigrationJobs: React.FC = () => {
   const navigate = useNavigate();
+  const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
+
+  const [loading, setLoading] = React.useState(false);
+  const [jobs, setJobs] = React.useState<JobResponse[]>([]);
   const onChange = (key: string) => {
     console.log(key);
   };
@@ -17,9 +25,22 @@ export const MigrationJobs: React.FC = () => {
     {
       key: '1',
       label: 'JOBS',
-      children: <JobsTable />
+      children: <JobsTable jobs={jobs} />
     }
   ];
+  const getAllMigrationJobs = async () => {
+    try {
+      setLoading(true);
+      const res = await getAllJobs(projectId);
+      setJobs(res);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getAllMigrationJobs();
+  }, [projectId]);
+  if (loading) return <Loading />;
   return (
     <>
       <Row className="px-5 py-2 border-b-1 border-solid border-border">
