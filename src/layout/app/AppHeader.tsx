@@ -38,7 +38,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ toggleSidebar }) => {
     }
   ];
   const onSelectChange = (value: string) => {
-    dispatch(selectProjectId(value));
+    dispatch(selectProjectId(+value));
   };
   return (
     <Header className="bg-white flex flex-row items-center justify-between border-b-1 border-border gap-2 px-4 h-12">

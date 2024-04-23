@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { MeetingReducers, MigrationJobState } from '../../types/migration-jobs-state.type.ts';
 const initialState: MigrationJobState = {
   step: 0,
-  projectId: ''
+  projectId: 0
 };
 export const migrationJobsSlice = createSlice<MigrationJobState, MeetingReducers>({
   name: 'MigrationJobs',

@@ -32,7 +32,7 @@ export const TestAndCreate: React.FC = () => {
       </div>
       <Modal
         title={<div className="font-semibold text-xl">Create & start migration job?</div>}
-        visible={openModal}
+        open={openModal}
         centered
         onCancel={() => setOpenModal(false)}
         onOk={() => setOpenModal(false)}
