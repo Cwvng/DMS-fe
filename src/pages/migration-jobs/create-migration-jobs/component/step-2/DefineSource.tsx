@@ -4,7 +4,7 @@ import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts'
 import React from 'react';
 import { dispatch } from '../../../../../redux/store';
 import { PlusOutlined } from '@ant-design/icons';
-import { CreateConnectionProfile } from './CreateConnectionProfile.tsx';
+import { CreateConnectionProfile } from '../../../../../components/profile/CreateConnectionProfile.tsx';
 import { ProfileTable } from '../../../../../components/profile/ProfileTable.tsx';
 import { profile, tableInfo } from './utils.tsx';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';

@@ -1,15 +1,7 @@
 import { Table, TableProps, Tag } from 'antd';
 import React from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
-
-interface DataType {
-  key: string;
-  name: string;
-  status: string;
-  phase: string;
-  src: string;
-  destination: string;
-}
+import { JobResponse } from '../../../requests/types/job.interface.ts';
 
 const getStatusTagColor = (status: string): string => {
   switch (status) {
@@ -22,7 +14,7 @@ const getStatusTagColor = (status: string): string => {
   }
 };
 
-const columns: TableProps<DataType>['columns'] = [
+const columns: TableProps<JobResponse>['columns'] = [
   {
     title: 'Migration job name',
     dataIndex: 'name',
@@ -51,18 +43,19 @@ const columns: TableProps<DataType>['columns'] = [
   {
     title: 'Phase',
     dataIndex: 'phase',
-    key: 'phase'
+    key: 'phase',
+    render: (text: string) => <span>{text.toUpperCase()}</span>
   },
   {
     title: 'Source connection profile',
     key: 'src',
-    dataIndex: 'src',
+    dataIndex: 'source_id',
     render: (text: string) => <a>{text}</a>
   },
   {
     title: 'Destination ID',
     key: 'destination',
-    dataIndex: 'destination',
+    dataIndex: 'target_id',
     render: (text: string) => <a>{text}</a>
   },
   {
@@ -72,32 +65,16 @@ const columns: TableProps<DataType>['columns'] = [
   }
 ];
 
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    phase: 'Progress',
-    src: 'New York No. 1 Lake Park',
-    status: 'Not started',
-    destination: 'example'
-  },
-  {
-    key: '2',
-    name: 'John Brown',
-    phase: 'Progress',
-    src: 'New York No. 1 Lake Park',
-    status: 'Done',
-    destination: 'example'
-  }
-];
-
-export const JobsTable: React.FC = () => {
+interface JobsTableProps {
+  jobs: JobResponse[];
+}
+export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
   return (
     <Table
       rowSelection={{ type: 'checkbox' }}
       className="w-full"
       columns={columns}
-      dataSource={data}
+      dataSource={jobs}
       pagination={{
         position: ['bottomCenter']
       }}

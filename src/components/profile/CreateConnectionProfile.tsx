@@ -1,7 +1,7 @@
 import { Col, Form, Row } from 'antd';
-import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
+import { FloatLabelSelect } from '../input/FloatLabelSelect.tsx';
 import React from 'react';
-import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput.tsx';
+import { FloatLabelInput } from '../input/FloatLabelInput.tsx';
 
 export const CreateConnectionProfile: React.FC = () => {
   return (
