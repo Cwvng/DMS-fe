@@ -31,8 +31,10 @@ export const MigrationJobs: React.FC = () => {
   const getAllMigrationJobs = async () => {
     try {
       setLoading(true);
-      const res = await getAllJobs(projectId);
-      setJobs(res);
+      if (projectId) {
+        const res = await getAllJobs(projectId);
+        setJobs(res);
+      }
     } finally {
       setLoading(false);
     }
