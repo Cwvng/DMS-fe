@@ -3,11 +3,11 @@ import { Col, Divider, Row } from 'antd';
 import { ProfileItem } from './type.tsx';
 
 interface ProfileProps {
-  profile: any;
+  data: any;
   tableInfo: ProfileItem[];
 }
 
-export const ProfileTable: React.FC<ProfileProps> = ({ profile, tableInfo }) => {
+export const DataTable: React.FC<ProfileProps> = ({ data, tableInfo }) => {
   return (
     <>
       {tableInfo.map((item, index) => (
@@ -16,7 +16,7 @@ export const ProfileTable: React.FC<ProfileProps> = ({ profile, tableInfo }) => 
           <Row className="flex justify-between my-1">
             <Col>{item.label}</Col>
             <Col>
-              <span className="font-medium">{profile[item.key]}</span>
+              <span className="font-medium">{data[item?.key]}</span>
             </Col>
           </Row>
         </React.Fragment>

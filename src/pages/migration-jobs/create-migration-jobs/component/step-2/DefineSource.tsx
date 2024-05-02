@@ -5,7 +5,7 @@ import React from 'react';
 import { dispatch } from '../../../../../redux/store';
 import { PlusOutlined } from '@ant-design/icons';
 import { CreateConnectionProfile } from '../../../../../components/profile/CreateConnectionProfile.tsx';
-import { ProfileTable } from '../../../../../components/profile/ProfileTable.tsx';
+import { DataTable } from '../../../../../components/profile/DataTable.tsx';
 import { profile, tableInfo } from './utils.tsx';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 
@@ -73,7 +73,7 @@ export const DefineSource: React.FC = () => {
             )}
           />
         </Form.Item>
-        {profile && <ProfileTable profile={profile} tableInfo={tableInfo} />}
+        {profile && <DataTable data={profile} tableInfo={tableInfo} />}
         <Form.Item>
           <Button
             type="primary"
