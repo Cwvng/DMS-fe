@@ -2,12 +2,13 @@ import { Table, TableProps, Tag } from 'antd';
 import React from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import { JobResponse } from '../../../requests/types/job.interface.ts';
+import { Link } from 'react-router-dom';
 
 const getStatusTagColor = (status: string): string => {
   switch (status) {
-    case 'Not started':
+    case 'not started':
       return 'geekblue';
-    case 'error':
+    case 'Failed':
       return 'volcano';
     default:
       return 'green';
@@ -21,7 +22,7 @@ const columns: TableProps<JobResponse>['columns'] = [
     key: 'name',
     filterSearch: true,
     onFilter: (value, record) => record.name.startsWith(value as string),
-    render: (text: string) => <span>{text}</span>
+    render: (text: string, record) => <Link to={`/migration-jobs/${record.job_id}`}>{text}</Link>
   },
   {
     title: 'Status',

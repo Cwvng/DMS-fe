@@ -8,6 +8,8 @@ import { ConversionWorkspaces } from './conversion-workspaces/ConversionWorkspac
 import { Error404 } from '../components/errors/Error404.tsx';
 import { Error403 } from '../components/errors/Error403.tsx';
 import { CreateMigrationJobs } from './migration-jobs/create-migration-jobs';
+import { JobDetail } from './job-detail';
+import { TaskDetail } from './job-detail/component/TaskDetail.tsx';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -36,6 +38,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<Navigate to="/migration-jobs" replace={true} />} />
 
         <Route path="/migration-jobs" element={<MigrationJobs />} />
+        <Route path="/migration-jobs/:id" element={<JobDetail />} />
+        <Route path="/migration-jobs/:id/tasks/:taskId" element={<TaskDetail />} />
         <Route path="/migration-jobs/create" element={<CreateMigrationJobs />} />
 
         <Route path="/connection-profiles" element={<ConnectionProfiles />} />

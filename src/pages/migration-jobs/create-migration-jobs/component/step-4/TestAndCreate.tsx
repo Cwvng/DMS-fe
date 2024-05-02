@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProfileTable } from '../../../../../components/profile/ProfileTable.tsx';
+import { DataTable } from '../../../../../components/profile/DataTable.tsx';
 import { migrationJob, tableInfo } from './utils.tsx';
 import { Button, Modal } from 'antd';
 import { IoIosWarning } from 'react-icons/io';
@@ -14,7 +14,7 @@ export const TestAndCreate: React.FC = () => {
         creating. You can create this job without starting it, or start it immediately
       </div>
       <div className="mt-5">
-        <ProfileTable profile={migrationJob} tableInfo={tableInfo} />
+        <DataTable data={migrationJob} tableInfo={tableInfo} />
       </div>
       <div className="text-lg font-bold mt-5">Test the migration job</div>
       <div className="mt-3 font-medium">

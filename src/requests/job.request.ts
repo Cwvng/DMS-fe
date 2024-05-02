@@ -1,7 +1,11 @@
-import { JobResponse } from './types/job.interface.ts';
+import { JobDetailResponse, JobResponse } from './types/job.interface.ts';
 import { api } from '../utils/api.util.ts';
 
 export const getAllJobs = async (projectId: number) => {
   const { data } = await api.get<JobResponse[]>(`/${projectId}/jobs/`);
+  return data;
+};
+export const getJobById = async (projectId: number, id: string) => {
+  const { data } = await api.get<JobDetailResponse>(`/${projectId}/jobs/${id}/`);
   return data;
 };
