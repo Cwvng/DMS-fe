@@ -1,12 +1,33 @@
-import { Table, TableProps, Tag } from 'antd';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Button, Form, Input, Modal, Table, TableProps, Tag } from 'antd';
+import React, { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { TaskResponse } from '../../../requests/types/task.interface.ts';
+import { getTasksByJobId } from '../../../requests/task.request.ts';
+import { AppState, useSelector } from '../../../redux/store';
+import { Loading } from '../../../components/loading/Loading.tsx';
+import { FaPlus } from 'react-icons/fa';
+import { useForm } from 'antd/es/form/Form';
 
-interface TasksProps {
-  tasks: TaskResponse[] | undefined;
-}
-export const Tasks: React.FC<TasksProps> = ({ tasks }) => {
+export const Tasks: React.FC = () => {
+  const [tasks, setTasks] = React.useState<TaskResponse[]>();
+  const [loading, setLoading] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
+
+  const { id } = useParams();
+  const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
+  const [form] = useForm();
+
+  const getTasksByJob = async () => {
+    try {
+      if (id) {
+        setLoading(true);
+        const res = await getTasksByJobId(projectId, id);
+        setTasks(res);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   const getStatusTagColor = (status: string): string => {
     switch (status) {
       case 'failed':
@@ -81,15 +102,42 @@ export const Tasks: React.FC<TasksProps> = ({ tasks }) => {
       }
     }
   ];
+  useEffect(() => {
+    getTasksByJob();
+  }, []);
+  if (loading) return <Loading />;
   return (
-    <Table
-      rowSelection={{ type: 'checkbox' }}
-      className="w-full"
-      columns={columns}
-      dataSource={tasks}
-      pagination={{
-        position: ['bottomCenter']
-      }}
-    />
+    <>
+      <Button
+        className="flex mr-3 ml-auto mb-2"
+        type="primary"
+        title="Create new task"
+        shape="circle"
+        onClick={() => setOpenModal(true)}
+        icon={<FaPlus />}
+      />
+      <Table
+        rowSelection={{ type: 'checkbox' }}
+        className="w-full"
+        columns={columns}
+        dataSource={tasks}
+        pagination={{
+          position: ['bottomCenter']
+        }}
+      />
+      <Modal
+        title={<span className="text-xl font-bold text-primary">Create new task</span>}
+        centered
+        open={openModal}
+        onCancel={() => setOpenModal(false)}
+        okText="Create"
+        onOk={form.submit}>
+        <Form layout="vertical" form={form}>
+          <Form.Item name="name" label={<span className="font-medium">Group chat name</span>}>
+            <Input size="large" />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
   );
 };

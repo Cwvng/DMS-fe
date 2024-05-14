@@ -10,10 +10,10 @@ import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 import { getConnectionByProjectId } from '../../../../../requests/connection.request.ts';
 import { SrcConnection } from '../../../../../requests/types/connection.interface.ts';
 
-interface DefineSourceProps {
-  setSrcId: any;
+interface DefineDestinationProps {
+  setTarId: any;
 }
-export const DefineSource: React.FC<DefineSourceProps> = ({ setSrcId }) => {
+export const DefineDestination: React.FC<DefineDestinationProps> = ({ setTarId }) => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
 
   const [openModal, setOpenModal] = React.useState(false);
@@ -29,7 +29,7 @@ export const DefineSource: React.FC<DefineSourceProps> = ({ setSrcId }) => {
   };
 
   useEffect(() => {
-    setSrcId(selectedSrc?.conn_id);
+    setTarId(selectedSrc?.conn_id);
   }, [selectedSrc]);
 
   useEffect(() => {
@@ -42,17 +42,17 @@ export const DefineSource: React.FC<DefineSourceProps> = ({ setSrcId }) => {
   if (srcList)
     return (
       <>
-        <div className="text-lg font-bold "> Define your source</div>
+        <div className="text-lg font-bold "> Define your destination</div>
         <div className="mt-3 font-medium">
-          Your data source connection profile represents all the info needed to connect. Choose a
-          connection profile that already exist, or create a new one. <a>Learn more</a>
+          Your data destination connection profile represents all the info needed to connect. Choose
+          a connection profile that already exist, or create a new one. <a>Learn more</a>
         </div>
         <Form className="mt-10">
           <Form.Item
             initialValue={srcList[0].conn_id}
-            rules={[{ required: true, message: 'Source is required' }]}>
+            rules={[{ required: true, message: 'Destination is required' }]}>
             <FloatLabelSelect
-              label="Select source connection profile"
+              label="Select destination connection profile"
               optionFilterProp="children"
               showSearch
               filterOption={(input, option) => (option?.label ?? '').toString().includes(input)}
@@ -102,7 +102,7 @@ export const DefineSource: React.FC<DefineSourceProps> = ({ setSrcId }) => {
               type="primary"
               htmlType="submit"
               className="mt-5"
-              onClick={() => dispatch(updateStep(2))}>
+              onClick={() => dispatch(updateStep(3))}>
               SAVE & CONTINUE
             </Button>
           </Form.Item>
