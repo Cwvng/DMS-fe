@@ -34,7 +34,7 @@ export const createApiInstance = (
       }
 
       if (!silent) {
-        message.error(error.response?.data?.message);
+        message.error(error.response?.data?.message || error.response?.data?.error);
       }
 
       return Promise.reject(error);

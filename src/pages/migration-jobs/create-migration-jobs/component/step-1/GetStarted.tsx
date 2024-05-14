@@ -1,41 +1,49 @@
 import React from 'react';
 import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput.tsx';
-import { Button, Card, Col, Form, Row } from 'antd';
+import { Button, Card, Col, Form, FormProps, Row } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
 import { MySQLInfo } from './MySQLInfo.tsx';
 import { useDispatch } from '../../../../../redux/store';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
+import { useForm } from 'antd/es/form/Form';
 
-export const GetStarted: React.FC = () => {
+interface GetStartedProps {
+  setType: any;
+  setName: any;
+}
+export const GetStarted: React.FC<GetStartedProps> = ({ setType, setName }) => {
   const [openModal, setOpenModal] = React.useState(false);
   const dispatch = useDispatch();
+
+  const [form] = useForm();
+  const saveForm: FormProps['onFinish'] = (values) => {
+    setType(values.type);
+    setName(values.name);
+    dispatch(updateStep(1));
+  };
+
   return (
     <>
       <div className="text-lg font-bold mb-5 "> Describe your migration jobs</div>
-      <Form>
-        <Form.Item>
+      <Form form={form} onFinish={saveForm}>
+        <Form.Item name="name">
           <FloatLabelInput label="Migration job name" name="email" />
         </Form.Item>
-        <Form.Item>
+        <Form.Item initialValue="MySQL">
           <FloatLabelSelect
             label="Source database engine"
-            defaultValue="MySQL"
-            options={[
-              { value: 'MySQL', label: 'MySQL' },
-              { value: 'MariaDb', label: 'MariaDb' }
-            ]}
+            options={[{ value: 'MySQL', label: 'MySQL' }]}
           />
           <i className="p-2 text-xs font-medium">
             By default, destination database must have the same database engine as source database
           </i>
         </Form.Item>
-        <Form.Item>
+        <Form.Item name="type">
           <FloatLabelSelect
             label="Migration job type"
-            defaultValue="Continuous"
             options={[
-              { value: 'One time', label: 'One time' },
+              { value: 'One-time', label: 'One-time' },
               { value: 'Continuous', label: 'Continuous' }
             ]}
           />
@@ -55,11 +63,7 @@ export const GetStarted: React.FC = () => {
           </Row>
         </Card>
         <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="mt-5"
-            onClick={() => dispatch(updateStep(1))}>
+          <Button type="primary" htmlType="submit" className="mt-5">
             SAVE & CONTINUE
           </Button>
         </Form.Item>
