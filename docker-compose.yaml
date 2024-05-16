@@ -10,4 +10,5 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    restart: always
     command: npm run dev -- --host 0.0.0.0
