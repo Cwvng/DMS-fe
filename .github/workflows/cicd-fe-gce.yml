@@ -46,7 +46,9 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
       - name: Copy docker-compose file
-        run: scp -i ~/.ssh/id_rsa docker-compose.yaml ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:/home/linhnt_ict/DMS-fe/
+        run: |
+          scp -i ~/.ssh/id_rsa docker-compose.yaml ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:/home/liinhhnt/
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "sudo mv /home/liinhhnt/docker-compose.yaml /home/linhnt_ict/DMS-fe/"
 
       - name: SSH to GGC and pull new images
         run: |
