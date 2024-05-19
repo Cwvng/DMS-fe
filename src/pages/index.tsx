@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { AppLayout } from '../layout/app/AppLayout.tsx';
 import { MigrationJobs } from './migration-jobs/MigrationJobs.tsx';
-import { ConnectionProfiles } from './connection-profiles/ConnectionProfiles.tsx';
+import { ConnectionProfiles } from './connection-profiles';
 import { PrivateConnectivity } from './private-connectivity/PrivateConnectivity.tsx';
 import { ConversionWorkspaces } from './conversion-workspaces/ConversionWorkspaces.tsx';
 import { Error404 } from '../components/errors/Error404.tsx';
@@ -10,6 +10,7 @@ import { Error403 } from '../components/errors/Error403.tsx';
 import { CreateMigrationJobs } from './migration-jobs/create-migration-jobs';
 import { JobDetail } from './job-detail';
 import { TaskDetail } from './job-detail/component/TaskDetail.tsx';
+import { ConnectionDetails } from './connection-profiles/ConnectionDetails.tsx';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -43,6 +44,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/migration-jobs/create" element={<CreateMigrationJobs />} />
 
         <Route path="/connection-profiles" element={<ConnectionProfiles />} />
+        <Route path="/connection-profiles/:id" element={<ConnectionDetails />} />
+
         <Route path="/private-connectivity" element={<PrivateConnectivity />} />
         <Route path="/conversion-workspaces" element={<ConversionWorkspaces />} />
       </Route>
