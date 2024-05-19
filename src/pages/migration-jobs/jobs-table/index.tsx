@@ -1,18 +1,22 @@
-import { Dropdown, Input, Menu, message, Modal, Spin, Table, Tag } from 'antd';
-import React from 'react';
-import { FaCheck, FaEllipsisV } from 'react-icons/fa';
+import { Dropdown, Menu, message, Modal, Table, Tag } from 'antd';
+import React, { useEffect } from 'react';
+import { FaEllipsisV } from 'react-icons/fa';
 import { JobResponse } from '../../../requests/types/job.interface.ts';
-import { Link } from 'react-router-dom';
-import { ExclamationCircleFilled, LoadingOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import { AppState, useDispatch, useSelector } from '../../../redux/store';
-import { deleteJob, updateJob } from '../../../requests/job.request.ts';
+import { deleteJob } from '../../../requests/job.request.ts';
 import { getJobList } from '../../../redux/slices/migration-jobs.slice.ts';
+import { JobStatus } from '../../../constant';
+import { Connection } from '../../../requests/types/connection.interface.ts';
+import { getConnectionByProjectId } from '../../../requests/connection.request.ts';
+import { Loading } from '../../../components/loading/Loading.tsx';
 
 const getStatusTagColor = (status: string): string => {
-  switch (status) {
-    case 'not started':
+  switch (status.toLowerCase()) {
+    case JobStatus.NOT_STARTED:
       return 'geekblue';
-    case 'Failed':
+    case JobStatus.FAILED:
       return 'volcano';
     default:
       return 'green';
@@ -21,15 +25,41 @@ const getStatusTagColor = (status: string): string => {
 
 interface JobsTableProps {
   jobs: JobResponse[];
+  setSelectedRow: React.Dispatch<React.SetStateAction<JobResponse[] | undefined>>;
 }
 
-export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
+export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [selectedJob, setSelectedJob] = React.useState<JobResponse | null>();
-  const [selectedName, setSelectedName] = React.useState<string>();
   const [loading, setLoading] = React.useState(false);
+  const [connectionList, setConnectionList] = React.useState<Connection[]>();
+
+  const rowSelection = {
+    onChange: (_: React.Key[], selectedRows: JobResponse[]) => {
+      setSelectedRow(selectedRows);
+    },
+    getCheckboxProps: (record: JobResponse) => ({
+      disabled: record.name === 'Disabled User',
+      name: record.name
+    })
+  };
+
+  const getConnectionList = async () => {
+    try {
+      setLoading(true);
+      const res = await getConnectionByProjectId(projectId);
+      setConnectionList(res);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mapConnectionName = (connId: string) => {
+    if (connectionList) return connectionList.filter((item) => item.conn_id === connId)[0].name;
+    else return null;
+  };
 
   const confirmDelete = (jobId: string) => {
     Modal.confirm({
@@ -54,28 +84,13 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
     }
   };
 
-  const updateSelectedJob = async (jobId: string) => {
-    try {
-      setLoading(true);
-      await updateJob(projectId, jobId, { name: selectedName });
-      setSelectedJob(null);
-      message.success('Updated successfully');
-      dispatch(getJobList(projectId));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const renderDropdownMenu = (job: JobResponse) => (
     <Menu
       items={[
         {
-          label: <span>Edit</span>,
-          key: 'edit',
-          onClick: () => {
-            setSelectedJob(job);
-            setSelectedName(job.name);
-          }
+          label: <span>Detail</span>,
+          key: 'detail',
+          onClick: () => navigate(`/migration-jobs/${job.job_id}`)
         },
         {
           label: <span>Delete</span>,
@@ -86,10 +101,19 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
     />
   );
 
+  useEffect(() => {
+    getConnectionList();
+  }, []);
+
+  if (loading) return <Loading />;
+
   return (
     <>
       <Table
-        rowSelection={{ type: 'checkbox' }}
+        rowSelection={{
+          type: 'checkbox',
+          ...rowSelection
+        }}
         className="w-full"
         columns={[
           {
@@ -98,31 +122,15 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
             key: 'name',
             filterSearch: true,
             onFilter: (value, record) => record.name.startsWith(value as string),
-            render: (text: string, record) => {
-              return record.job_id === selectedJob?.job_id ? (
-                <Input
-                  value={selectedName}
-                  onChange={(e) => setSelectedName(e.target.value)}
-                  suffix={
-                    loading ? (
-                      <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-                    ) : (
-                      <FaCheck
-                        className="cursor-pointer text-primary"
-                        onClick={() => updateSelectedJob(record.job_id)}
-                      />
-                    )
-                  }
-                />
-              ) : (
-                <Link to={`/migration-jobs/${record.job_id}`}>{text}</Link>
-              );
-            }
+            render: (text: string, record) => (
+              <Link to={`/migration-jobs/${record.job_id}`}>{text}</Link>
+            )
           },
           {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
+            align: 'center',
             sorter: {
               compare: (a: any, b: any) => a.status.localeCompare(b.status),
               multiple: 1
@@ -140,23 +148,30 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
             title: 'Phase',
             dataIndex: 'phase',
             key: 'phase',
+            align: 'center',
             render: (text: string) => <span>{text?.toUpperCase()}</span>
           },
           {
             title: 'Source connection profile',
             key: 'src',
             dataIndex: 'source_id',
-            render: (text: string) => <a>{text}</a>
+            render: (id: string) => (
+              <Link to={`/connection-profiles/${id}`}>{mapConnectionName(id)}</Link>
+            )
           },
           {
             title: 'Destination ID',
             key: 'destination',
             dataIndex: 'target_id',
-            render: (text: string) => <a>{text}</a>
+            render: (id: string) => (
+              <Link to={`/connection-profiles/${id}`}>{mapConnectionName(id)}</Link>
+            )
           },
           {
+            title: 'Action',
             key: 'action',
             dataIndex: 'job_id',
+            align: 'center',
             render: (_, record) => (
               <Dropdown
                 overlay={renderDropdownMenu(record)}
@@ -169,6 +184,7 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs }) => {
           }
         ]}
         dataSource={jobs}
+        rowKey={(record) => record.job_id}
         pagination={{
           position: ['bottomCenter']
         }}

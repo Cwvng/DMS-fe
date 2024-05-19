@@ -1,56 +1,67 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DataTable } from '../../../../../components/profile/DataTable.tsx';
-import { Button, message, Modal, Spin } from 'antd';
+import { Button, message, Modal, Skeleton } from 'antd';
 import { IoIosWarning } from 'react-icons/io';
 import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
 import { createJob } from '../../../../../requests/job.request.ts';
-import { AppState, useSelector } from '../../../../../redux/store';
+import { AppState, useDispatch, useSelector } from '../../../../../redux/store';
 import { useNavigate } from 'react-router-dom';
-import { getConnectionDetail, testConnection } from '../../../../../requests/connection.request.ts';
-import { LoadingOutlined } from '@ant-design/icons';
+import { getConnectionDetail } from '../../../../../requests/connection.request.ts';
+import { useMigrationJobContext } from '../../index.tsx';
+import { Connection } from '../../../../../requests/types/connection.interface.ts';
+import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 
-interface TestAndCreateProps {
-  data: CreateJobBody | undefined;
-}
-export const TestAndCreate: React.FC<TestAndCreateProps> = ({ data }) => {
+export const TestAndCreate: React.FC = () => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { name, type, srcId, tarId } = useMigrationJobContext();
 
   const [openModal, setOpenModal] = React.useState(false);
-  const [openTest, setOpenTest] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [srcLoading, setSrcLoading] = React.useState(false);
-  const [tarLoading, setTarLoading] = React.useState(false);
+  const [connectionLoading, setConnectionLoading] = React.useState(false);
+  const [data, setData] = React.useState<CreateJobBody>();
+  const [srcDetail, setSrcDetail] = React.useState<Connection>();
+  const [tarDetail, setTarDetail] = React.useState<Connection>();
 
   const createMigrationJob = async () => {
     try {
       setLoading(true);
-      if (data) await createJob(projectId, data);
+      await createJob(projectId, data!);
       message.success('Created new migration job');
+      dispatch(updateStep(0));
       navigate('/migration-jobs');
     } finally {
       setLoading(false);
     }
   };
-  const testMigrationJob = async () => {
+  const getConnection = async () => {
     try {
-      if (data?.source_id && data.target_id) {
-        setSrcLoading(true);
-        setTarLoading(true);
-        setOpenTest(true);
-        const srdDetail = await getConnectionDetail(projectId, data.source_id);
-        const targetDetail = await getConnectionDetail(projectId, data.target_id);
-        const srcRes = await testConnection(projectId, data?.source_id, srdDetail);
-        const targetRes = await testConnection(projectId, data?.source_id, targetDetail);
-        message.success('Target ' + srcRes.message);
-        message.success('Destination ' + targetRes.message);
+      setConnectionLoading(true);
+      if (tarId && srcId) {
+        const srcRes = await getConnectionDetail(projectId, srcId);
+        const tarRes = await getConnectionDetail(projectId, tarId);
+        setSrcDetail(srcRes);
+        setTarDetail(tarRes);
       }
     } finally {
-      setSrcLoading(false);
-      setTarLoading(false);
-      setOpenTest(false);
+      setConnectionLoading(false);
     }
   };
+
+  useEffect(() => {
+    setData({
+      name,
+      job_type: type,
+      source_id: srcId,
+      target_id: tarId
+    });
+  }, [name, type, srcId, tarId]);
+
+  useEffect(() => {
+    getConnection();
+  }, []);
+
   return (
     <>
       <div className="text-lg font-bold ">Test and create your migration job</div>
@@ -59,47 +70,58 @@ export const TestAndCreate: React.FC<TestAndCreateProps> = ({ data }) => {
         creating. You can create this job without starting it, or start it immediately
       </div>
       <div className="mt-5">
-        {data && (
-          <DataTable
-            data={data}
-            tableInfo={[
-              { label: 'Migration job name', key: 'name' },
-              { label: 'Source database engine', key: 'source_id' },
-              { label: 'Destination database engine', key: 'destination' },
-              { label: 'Type', key: 'type' },
-              { label: 'Connection profile name', key: 'connectionName' },
-              { label: 'Destination connection profile name', key: 'target_id' },
-              { label: 'Hostname:Port', key: 'hostname' }
-            ]}
-          />
+        {data && data.name !== '' && (
+          <>
+            <>
+              <h4 className="text-secondary">Migration job</h4>
+              <DataTable
+                data={data}
+                tableInfo={[
+                  { label: 'Migration job name', key: 'name' },
+                  { label: 'Job type', key: 'job_type' }
+                ]}
+              />
+            </>
+            <Skeleton loading={connectionLoading} active />
+            <Skeleton loading={connectionLoading} active />
+            {srcDetail && (
+              <>
+                <h4 className="text-secondary">Source connection</h4>
+                <DataTable
+                  data={srcDetail}
+                  tableInfo={[
+                    { label: 'Source connection name', key: 'name' },
+                    { label: 'Source connection engine', key: 'engine' },
+                    { label: 'Hostname:Port', key: 'host port' }
+                  ]}
+                />
+              </>
+            )}
+            {tarDetail && (
+              <>
+                <h4 className="text-secondary">Destination connection</h4>
+                <DataTable
+                  data={tarDetail}
+                  tableInfo={[
+                    { label: 'Destination connection name', key: 'name' },
+                    { label: 'Destination connection engine', key: 'engine' },
+                    { label: 'Hostname:Port', key: 'host port' }
+                  ]}
+                />
+              </>
+            )}
+          </>
         )}
       </div>
-      <div className="text-lg font-bold mt-5">Test the migration job</div>
-      <div className="mt-3 font-medium">
-        Test your job to make sure all prerequisites were fulfilled to ensure your source can
-        connect to your destination
-      </div>
-      {openTest && (
-        <div className="shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-3 p-5">
-          <div className="flex gap-5 items-center">
-            <Spin
-              spinning={srcLoading}
-              indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-            />
-            {srcLoading ? <>Connecting to source connection profile ...</> : <></>}
-          </div>
-          <div className="mt-2 flex gap-5 items-center">
-            <Spin
-              spinning={tarLoading}
-              indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-            />
-            {tarLoading ? <>Connecting to destination connection profile ...</> : <></>}
-          </div>
-        </div>
-      )}
+
       <div className="mt-5">
-        <Button className="mr-5" onClick={() => testMigrationJob()}>
-          TEST JOB
+        <Button
+          onClick={() => {
+            navigate('/');
+            dispatch(updateStep(0));
+          }}
+          className="mr-3">
+          CANCEL
         </Button>
         <Button loading={loading} onClick={createMigrationJob} className="mr-2" type="primary">
           CREATE JOB

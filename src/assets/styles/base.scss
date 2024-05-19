@@ -20,6 +20,13 @@ body,
    border-style: solid;
    border-color: currentColor /* or gray-DEFAULT / gray-400 */;
  }
+.ant-btn-text:disabled{
+  background-color: #ffffff ;
+  color: #8f8f8b !important;
+  &:hover{
+    background-color: #ffffff !important; ;
+  }
+}
 /* width */
 ::-webkit-scrollbar {
   width: 5px;

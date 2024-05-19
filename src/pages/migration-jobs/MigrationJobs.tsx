@@ -8,11 +8,15 @@ import { JobsTable } from './jobs-table';
 import { useNavigate } from 'react-router-dom';
 import { AppState, useDispatch, useSelector } from '../../redux/store';
 import { getJobList } from '../../redux/slices/migration-jobs.slice.ts';
+import { JobResponse } from '../../requests/types/job.interface.ts';
+import { JobStatus, Phase } from '../../constant';
 
 export const MigrationJobs: React.FC = () => {
   const navigate = useNavigate();
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const jobs = useSelector((app: AppState) => app.migrationJob.jobList || []);
+  const [selectedRow, setSelectedRow] = React.useState<JobResponse[]>();
+
   const dispatch = useDispatch();
 
   const onChange = (key: string) => {
@@ -23,7 +27,7 @@ export const MigrationJobs: React.FC = () => {
     {
       key: '1',
       label: 'JOBS',
-      children: <JobsTable jobs={jobs} />
+      children: <JobsTable jobs={jobs} setSelectedRow={setSelectedRow} />
     }
   ];
 
@@ -44,11 +48,71 @@ export const MigrationJobs: React.FC = () => {
               title="CREATE MIGRATION JOB"
               onClick={() => navigate('/migration-jobs/create')}
             />
-            <DMSButton disabled icon={<FaPlay />} type="text" title="START" />
-            <DMSButton disabled icon={<FaSquare />} type="text" title="STOP" />
-            <DMSButton disabled icon={<BsBootstrapReboot />} type="text" title="RESTART" />
-            <DMSButton disabled icon={<GrResume />} type="text" title="RESUME" />
-            <DMSButton disabled icon={<FaTrash />} type="text" title="DELETE" />
+            <DMSButton
+              disabled={
+                !selectedRow ||
+                selectedRow.length !== 1 ||
+                selectedRow[0]?.status !== JobStatus.NOT_STARTED
+              }
+              icon={<FaPlay />}
+              type="text"
+              title="START"
+            />
+            <DMSButton
+              disabled={
+                !selectedRow ||
+                selectedRow.length !== 1 ||
+                !(
+                  (selectedRow[0]?.status === JobStatus.RUNNING &&
+                    selectedRow[0]?.phase === Phase.FULL_DUMP) ||
+                  (selectedRow[0]?.status === JobStatus.RUNNING &&
+                    selectedRow[0]?.phase === Phase.CDC)
+                )
+              }
+              icon={<FaSquare />}
+              type="text"
+              title="STOP"
+            />
+            <DMSButton
+              disabled={
+                !selectedRow ||
+                selectedRow.length !== 1 ||
+                !(
+                  (selectedRow[0]?.status === JobStatus.STOPPED &&
+                    selectedRow[0]?.phase === Phase.CDC) ||
+                  (selectedRow[0]?.status === JobStatus.FAILED &&
+                    selectedRow[0]?.phase === Phase.CDC)
+                )
+              }
+              icon={<BsBootstrapReboot />}
+              type="text"
+              title="RESUME"
+            />
+            <DMSButton
+              disabled={
+                !selectedRow ||
+                selectedRow.length !== 1 ||
+                !(
+                  (selectedRow[0]?.status === JobStatus.STOPPED &&
+                    selectedRow[0]?.phase === Phase.FULL_DUMP) ||
+                  (selectedRow[0]?.status === JobStatus.FAILED &&
+                    selectedRow[0]?.phase === Phase.FULL_DUMP)
+                )
+              }
+              icon={<GrResume />}
+              type="text"
+              title="RESTART"
+            />
+            <DMSButton
+              disabled={
+                !selectedRow ||
+                selectedRow.length === 0 ||
+                selectedRow[0]?.status === JobStatus.STOPPING
+              }
+              icon={<FaTrash />}
+              type="text"
+              title="DELETE"
+            />
           </div>
         </Col>
       </Row>

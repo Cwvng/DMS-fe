@@ -1,11 +1,10 @@
-import { Button, Form, Input, Modal, Table, TableProps, Tag } from 'antd';
+import { Form, Input, Modal, Table, TableProps, Tag } from 'antd';
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { TaskResponse } from '../../../requests/types/task.interface.ts';
 import { getTasksByJobId } from '../../../requests/task.request.ts';
 import { AppState, useSelector } from '../../../redux/store';
 import { Loading } from '../../../components/loading/Loading.tsx';
-import { FaPlus } from 'react-icons/fa';
 import { useForm } from 'antd/es/form/Form';
 
 export const Tasks: React.FC = () => {
@@ -68,24 +67,28 @@ export const Tasks: React.FC = () => {
       title: 'Total migration time',
       dataIndex: 'total_migration_time',
       key: 'total_migration_time',
+      align: 'center',
       render: (text: string) => <span>{text}</span>
     },
     {
       title: 'Total DDL queries migrated',
       dataIndex: 'total_ddls',
       key: 'total_ddls',
+      align: 'center',
       render: (text: string) => <span>{text}</span>
     },
     {
       title: 'Total rows migrated',
       dataIndex: 'total_rows',
       key: 'total_rows',
+      align: 'center',
       render: (text: string) => <span>{text}</span>
     },
     {
       title: 'Task mode',
       dataIndex: 'task_mode',
       key: 'task_mode',
+      align: 'center',
       render: (text: string) => <span>{text}</span>
     },
     {
@@ -108,19 +111,11 @@ export const Tasks: React.FC = () => {
   if (loading) return <Loading />;
   return (
     <>
-      <Button
-        className="flex mr-3 ml-auto mb-2"
-        type="primary"
-        title="Create new task"
-        shape="circle"
-        onClick={() => setOpenModal(true)}
-        icon={<FaPlus />}
-      />
       <Table
-        rowSelection={{ type: 'checkbox' }}
         className="w-full"
         columns={columns}
         dataSource={tasks}
+        rowKey={(record) => record.task_id}
         pagination={{
           position: ['bottomCenter']
         }}

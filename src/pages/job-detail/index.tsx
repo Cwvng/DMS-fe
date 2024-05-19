@@ -2,6 +2,7 @@ import { Tabs, TabsProps } from 'antd';
 import React from 'react';
 import { GeneralInformation } from './component/GeneralInformation.tsx';
 import { Tasks } from './component/Tasks.tsx';
+import { PageHeader } from '../../components/page-header/PageHeader.tsx';
 
 export const JobDetail: React.FC = () => {
   const items: TabsProps['items'] = [
@@ -18,8 +19,11 @@ export const JobDetail: React.FC = () => {
   ];
 
   return (
-    <div className="px-5">
-      <Tabs defaultActiveKey="1" items={items} />
+    <div>
+      <PageHeader title="Migration job detail" />
+      <div className="px-5">
+        <Tabs defaultActiveKey="1" items={items} />
+      </div>
     </div>
   );
 };
