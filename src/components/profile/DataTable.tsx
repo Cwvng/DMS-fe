@@ -16,7 +16,7 @@ export const DataTable: React.FC<ProfileProps> = ({ data, tableInfo }) => {
           <Row className="flex justify-between my-1">
             <Col>{item.label}</Col>
             <Col>
-              <span className="font-medium">{data[item?.key]}</span>
+              <span className="font-medium">{item.key.split(' ').map((k) => data[k] + ' ')}</span>
             </Col>
           </Row>
         </React.Fragment>

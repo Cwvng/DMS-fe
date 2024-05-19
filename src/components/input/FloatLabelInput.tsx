@@ -11,7 +11,7 @@ export const FloatLabelInput: React.FC<FloatLabelInputProps> = (props) => {
 
   if (!placeholder) placeholder = label;
 
-  const isOccupied = focus || value !== '';
+  const isOccupied = focus || value !== ' ';
 
   const labelClass = isOccupied
     ? 'absolute left-3 -top-3 text-sm bg-white px-1 ml-[-4px] text-primary transition-all duration-200 z-40'

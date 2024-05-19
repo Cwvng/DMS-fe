@@ -1,4 +1,4 @@
-export interface SrcConnection {
+export interface Connection {
   conn_id: string;
   project_id: string;
   name: string;
@@ -7,11 +7,12 @@ export interface SrcConnection {
   username: string;
   password: string;
   engine: string;
+  in_used_by: string;
 }
-export interface CreateSrcTargetConnectionBody {
+export interface CreateConnectionBody {
   name: string;
   host: string;
   username: string;
   password: string;
 }
-export type UpdateConnectionBody = Partial<SrcConnection>;
+export type UpdateConnectionBody = Partial<Connection>;

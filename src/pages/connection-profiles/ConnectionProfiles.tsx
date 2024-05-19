@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Spin, Table } from 'antd';
 import { DMSButton } from '../../components/button/DMSButton.tsx';
-import { FaCheck, FaEllipsisV, FaPlusSquare } from 'react-icons/fa';
-import { CreateConnectionProfile } from '../../components/profile/CreateConnectionProfile.tsx';
+import { FaCheck, FaEllipsisV, FaPlusSquare, FaTrash } from 'react-icons/fa';
+import { ConnectionProfileForm } from '../../components/profile/ConnectionProfileForm.tsx';
 import { SideModal } from '../../components/side-modal/SideModal.tsx';
-import { SrcConnection } from '../../requests/types/connection.interface.ts';
+import { Connection } from '../../requests/types/connection.interface.ts';
 import { AppState, useSelector } from '../../redux/store';
 import {
   deleteConnection,
@@ -19,10 +19,11 @@ export const ConnectionProfiles: React.FC = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [connectLoading, setConnectLoading] = React.useState(false);
-  const [connectionList, setConnectionList] = React.useState<SrcConnection[]>();
-  const [selectedConn, setSelectedConn] = React.useState<SrcConnection | null>();
-  const [selectedTestConn, setSelectedTestConn] = React.useState<SrcConnection | null>();
+  const [connectionList, setConnectionList] = React.useState<Connection[]>();
+  const [selectedConn, setSelectedConn] = React.useState<Connection | null>();
+  const [selectedTestConn, setSelectedTestConn] = React.useState<Connection | null>();
   const [selectedName, setSelectedName] = React.useState<string | undefined>();
+  const [selectedRow, setSelectedRow] = React.useState<Connection[]>();
 
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
 
@@ -38,6 +39,7 @@ export const ConnectionProfiles: React.FC = () => {
     try {
       await deleteConnection(projectId, connId);
       message.success('Deleted successfully');
+      setSelectedConn(null);
       await getAllConnectionList();
     } finally {
     }
@@ -69,7 +71,7 @@ export const ConnectionProfiles: React.FC = () => {
       cancelButtonProps: { className: 'border-primary text-primary' }
     });
   };
-  const testSelectedConnection = async (data: SrcConnection) => {
+  const testSelectedConnection = async (data: Connection) => {
     try {
       setConnectLoading(true);
       const res = await testConnection(projectId, data.conn_id, data);
@@ -79,31 +81,49 @@ export const ConnectionProfiles: React.FC = () => {
     }
   };
 
-  const renderDropdownMenu = (conn: SrcConnection) => (
+  const renderDropdownMenu = (conn: Connection) => (
     <Menu
-      items={[
-        {
-          label: <span>Test connection</span>,
-          key: 'connection',
-          onClick: () => {
-            setSelectedTestConn(conn);
-            testSelectedConnection(conn);
-          }
-        },
-        {
-          label: <span>Edit</span>,
-          key: 'edit',
-          onClick: () => {
-            setSelectedConn(conn);
-            setSelectedName(conn.name);
-          }
-        },
-        {
-          label: <span>Delete</span>,
-          key: 'delete',
-          onClick: () => confirmDelete(conn.conn_id)
-        }
-      ]}
+      items={
+        conn.in_used_by === '0'
+          ? [
+              {
+                label: <span>Test connection</span>,
+                key: 'connection',
+                onClick: () => {
+                  setSelectedTestConn(conn);
+                  testSelectedConnection(conn);
+                }
+              },
+              {
+                label: <span>Edit</span>,
+                key: 'edit',
+                onClick: () => {
+                  setSelectedConn(conn);
+                  setSelectedName(conn.name);
+                }
+              },
+              {
+                label: <span>Delete</span>,
+                key: 'delete',
+                onClick: () => confirmDelete(conn.conn_id)
+              }
+            ]
+          : [
+              {
+                label: <span>Test connection</span>,
+                key: 'connection',
+                onClick: () => {
+                  setSelectedTestConn(conn);
+                  testSelectedConnection(conn);
+                }
+              },
+              {
+                label: <span>Delete</span>,
+                key: 'delete',
+                onClick: () => confirmDelete(conn.conn_id)
+              }
+            ]
+      }
     />
   );
 
@@ -128,6 +148,14 @@ export const ConnectionProfiles: React.FC = () => {
               title="CREATE PROFILE"
               onClick={() => setOpenModal(true)}
             />
+            {selectedRow && selectedRow.length > 0 && (
+              <DMSButton
+                icon={<FaTrash />}
+                type="text"
+                title="DELETE"
+                onClick={() => confirmDelete(selectedRow[0].conn_id)}
+              />
+            )}
           </div>
         </Col>
       </Row>
@@ -141,7 +169,16 @@ export const ConnectionProfiles: React.FC = () => {
       </Row>
       <div className="px-5">
         <Table
-          rowSelection={{ type: 'checkbox' }}
+          rowSelection={{
+            type: 'checkbox',
+            onChange: (_: React.Key[], selectedRows: Connection[]) => {
+              setSelectedRow(selectedRows);
+            },
+            getCheckboxProps: (record: Connection) => ({
+              disabled: record.name === 'Disabled User',
+              name: record.name
+            })
+          }}
           className="w-full"
           columns={[
             {
@@ -174,27 +211,30 @@ export const ConnectionProfiles: React.FC = () => {
             },
             {
               title: 'In use by',
-              dataIndex: 'inUseBy',
+              dataIndex: 'in_used_by',
               key: 'inUseBy'
             },
             {
               title: 'Database engine',
               dataIndex: 'engine',
-              key: 'dbEngine'
+              key: 'dbEngine',
+              align: 'center'
             },
             {
-              title: 'Hostname',
+              title: 'Hostname/IP',
               key: 'host',
               dataIndex: 'host'
             },
             {
-              title: 'IP:Port',
+              title: 'Port',
               key: 'port',
               dataIndex: 'port'
             },
             {
+              title: 'Action',
               key: 'action',
               dataIndex: 'conn_id',
+              align: 'center',
               render: (_, record) => {
                 return record.conn_id === selectedTestConn?.conn_id && connectLoading ? (
                   <div className="flex items-center gap-2">
@@ -213,6 +253,7 @@ export const ConnectionProfiles: React.FC = () => {
             }
           ]}
           dataSource={connectionList}
+          rowKey={(record) => record.conn_id}
           pagination={{
             position: ['bottomCenter']
           }}
@@ -229,7 +270,7 @@ export const ConnectionProfiles: React.FC = () => {
         ]}
         okText="CREATE"
         cancelText="CANCEL">
-        <CreateConnectionProfile closeModal={() => setOpenModal(false)} />
+        <ConnectionProfileForm closeModal={() => setOpenModal(false)} />
       </SideModal>
     </>
   );
