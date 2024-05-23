@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/Form';
 import { CreateJobBody } from '../../../requests/types/job.interface.ts';
+import { MigrationType } from '../../../constant';
 
 export const CreateMigrationJobs: React.FC = () => {
   const dispatch = useDispatch();
@@ -64,7 +65,7 @@ export const CreateMigrationJobs: React.FC = () => {
           form={form}
           initialValues={{
             name: '',
-            job_type: 'One-time migration',
+            job_type: MigrationType.ONE_TIME_MIGRATION,
             source_id: null,
             target_id: null
           }}

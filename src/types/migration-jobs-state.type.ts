@@ -5,6 +5,7 @@ export interface MigrationJobState {
   step: number;
   projectId: number;
   jobList: JobResponse[] | null;
+  loading: boolean;
 }
 
 export type MeetingCaseReducer<P = any> = CaseReducer<MigrationJobState, PayloadAction<P>>;

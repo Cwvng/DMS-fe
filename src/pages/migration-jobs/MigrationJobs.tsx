@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, message, Modal, Row, Tabs, TabsProps } from 'antd';
 import { DMSButton } from '../../components/button/DMSButton.tsx';
 import { FaPlay, FaPlusSquare, FaSquare, FaTrash } from 'react-icons/fa';
@@ -11,7 +11,8 @@ import { getJobList } from '../../redux/slices/migration-jobs.slice.ts';
 import { JobResponse } from '../../requests/types/job.interface.ts';
 import { JobStatus, Phase } from '../../constant';
 import { ExclamationCircleFilled } from '@ant-design/icons';
-import { deleteJob } from '../../requests/job.request.ts';
+import { actionJob, deleteJob } from '../../requests/job.request.ts';
+import { VscDebugRestart } from 'react-icons/vsc';
 
 export const MigrationJobs: React.FC = () => {
   const navigate = useNavigate();
@@ -19,9 +20,10 @@ export const MigrationJobs: React.FC = () => {
   const jobs = useSelector((app: AppState) =>
     (app.migrationJob.jobList || []).slice().sort((a, b) => a.name.localeCompare(b.name))
   );
-  const [selectedRow, setSelectedRow] = React.useState<JobResponse[]>();
-
   const dispatch = useDispatch();
+
+  const [selectedRow, setSelectedRow] = React.useState<JobResponse[]>();
+  const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
   const onChange = (key: string) => {
     console.log(key);
@@ -37,6 +39,7 @@ export const MigrationJobs: React.FC = () => {
 
   const deleteSelectedJobs = async () => {
     try {
+      setLoadingButton('delete');
       if (selectedRow)
         selectedRow.map(async (item) => {
           await deleteJob(projectId, item.job_id);
@@ -44,12 +47,87 @@ export const MigrationJobs: React.FC = () => {
           dispatch(getJobList(projectId));
         });
     } finally {
+      setLoadingButton(null);
+      setSelectedRow([]);
+    }
+  };
+
+  const startJob = async () => {
+    try {
+      setLoadingButton('start');
+      if (selectedRow?.[0].job_id) {
+        const startJobBody = {
+          status: 'not started',
+          action: 'start'
+        };
+        await actionJob(projectId, selectedRow[0].job_id, startJobBody);
+        message.success('Started a job');
+        dispatch(getJobList(projectId));
+      }
+    } finally {
+      setLoadingButton(null);
+      setSelectedRow([]);
+    }
+  };
+
+  const stopJob = async () => {
+    try {
+      setLoadingButton('stop');
+      if (selectedRow?.[0].job_id) {
+        const stopJobBody = {
+          status: 'stopped'
+        };
+        await actionJob(projectId, selectedRow[0].job_id, stopJobBody);
+        message.success('Stopped a job');
+        dispatch(getJobList(projectId));
+      }
+    } finally {
+      setLoadingButton(null);
+      setSelectedRow([]);
+    }
+  };
+
+  const resumeJob = async () => {
+    try {
+      setLoadingButton('resume');
+      if (selectedRow?.[0].job_id) {
+        const resumeJobBody = {
+          status: 'stopped',
+          phase: 'cdc',
+          action: 'resume'
+        };
+        await actionJob(projectId, selectedRow[0].job_id, resumeJobBody);
+        message.success('Resumed a job');
+        dispatch(getJobList(projectId));
+      }
+    } finally {
+      setLoadingButton(null);
+      setSelectedRow([]);
+    }
+  };
+  const restartJob = async () => {
+    try {
+      setLoadingButton('restart');
+      if (selectedRow?.[0].job_id) {
+        const resumeJobBody = {
+          status: 'stopped',
+          phase: 'full dump',
+          action: 'restart'
+        };
+        await actionJob(projectId, selectedRow[0].job_id, resumeJobBody);
+        message.success('Restarted a job');
+        dispatch(getJobList(projectId));
+      }
+    } finally {
+      setLoadingButton(null);
+      setSelectedRow([]);
     }
   };
 
   useEffect(() => {
     dispatch(getJobList(projectId));
   }, [projectId]);
+
   return (
     <>
       <Row className="px-5 py-2 border-b-1 border-solid border-border">
@@ -75,7 +153,9 @@ export const MigrationJobs: React.FC = () => {
                 )
               }
               icon={<FaPlay />}
+              onClick={() => startJob()}
               type="text"
+              loading={loadingButton === 'start'}
               title="START">
               START
             </DMSButton>
@@ -92,6 +172,8 @@ export const MigrationJobs: React.FC = () => {
               }
               icon={<FaSquare />}
               type="text"
+              loading={loadingButton === 'stop'}
+              onClick={() => stopJob()}
               title="STOP">
               STOP
             </DMSButton>
@@ -107,7 +189,9 @@ export const MigrationJobs: React.FC = () => {
                 )
               }
               icon={<BsBootstrapReboot />}
+              onClick={() => resumeJob()}
               type="text"
+              loading={loadingButton === 'resume'}
               title="RESUME">
               RESUME
             </DMSButton>
@@ -124,6 +208,8 @@ export const MigrationJobs: React.FC = () => {
               }
               icon={<GrResume />}
               type="text"
+              loading={loadingButton === 'restart'}
+              onClick={() => restartJob()}
               title="RESTART">
               RESTART
             </DMSButton>
@@ -133,6 +219,7 @@ export const MigrationJobs: React.FC = () => {
                 selectedRow.length === 0 ||
                 selectedRow[0]?.status === JobStatus.STOPPING
               }
+              loading={loadingButton === 'delete'}
               icon={<FaTrash />}
               onClick={() => {
                 Modal.confirm({
@@ -160,7 +247,14 @@ export const MigrationJobs: React.FC = () => {
           Migration jobs allow you to move data from source to destination databases automatically
         </div>
       </Row>
-      <div className="px-5">
+      <div className="px-5 relative">
+        <VscDebugRestart
+          className="absolute top-5 right-10 z-50 text-primary text-xl hover:cursor-pointer"
+          title="Refresh"
+          onClick={() => {
+            dispatch(getJobList(projectId));
+          }}
+        />
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
     </>

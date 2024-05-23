@@ -1,4 +1,5 @@
 import {
+  ActionJobBody,
   CreateJobBody,
   JobDetailResponse,
   JobResponse,
@@ -24,5 +25,10 @@ export const deleteJob = async (projectId: number, id: string) => {
 };
 export const updateJob = async (projectId: number, id: string, body: UpdateJobBody) => {
   const { data } = await api.patch<JobResponse>(`/${projectId}/jobs/${id}/`, body);
+  return data;
+};
+
+export const actionJob = async (projectId: number, jobId: string, body: ActionJobBody) => {
+  const { data } = await api.patch(`${projectId}/jobs/${jobId}/`, body);
   return data;
 };

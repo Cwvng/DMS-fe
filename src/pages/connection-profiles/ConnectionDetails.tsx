@@ -14,6 +14,7 @@ import { Loading } from '../../components/loading/Loading.tsx';
 import { Col, Divider, Form, FormProps, Input, message, Modal, Row } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/Form';
+import { FaX } from 'react-icons/fa6';
 
 export const ConnectionDetails: React.FC = () => {
   const { id } = useParams();
@@ -91,27 +92,32 @@ export const ConnectionDetails: React.FC = () => {
         button={
           <>
             {edit ? (
-              <DMSButton
-                disabled={connection?.in_used_by === '0'}
-                icon={<FaCheck />}
-                onClick={form.submit}
-                type="text"
-                loading={isUpdate}
-                title={
-                  connection?.in_used_by === '0'
-                    ? 'You cannot action while this connection in used'
-                    : 'SAVE'
-                }>
-                SAVE
-              </DMSButton>
+              <>
+                <DMSButton icon={<FaX />} onClick={() => setEdit(false)} type="text" title="CANCEL">
+                  CANCEL
+                </DMSButton>
+                <DMSButton
+                  disabled={connection?.in_used_by === 1}
+                  icon={<FaCheck />}
+                  onClick={form.submit}
+                  type="text"
+                  loading={isUpdate}
+                  title={
+                    connection?.in_used_by === 1
+                      ? 'You cannot action while this connection in used'
+                      : 'SAVE'
+                  }>
+                  SAVE
+                </DMSButton>
+              </>
             ) : (
               <DMSButton
-                disabled={connection?.in_used_by === '0'}
+                disabled={connection?.in_used_by === 1}
                 icon={<FaEdit />}
                 onClick={() => setEdit(true)}
                 type="text"
                 title={
-                  connection?.in_used_by === '0'
+                  connection?.in_used_by === 1
                     ? 'You cannot action while this connection in used'
                     : 'EDIT'
                 }>
@@ -120,9 +126,14 @@ export const ConnectionDetails: React.FC = () => {
             )}
 
             <DMSButton
+              disabled={connection?.in_used_by === 1}
               icon={<FaTrash />}
               type="text"
-              title="DELETE"
+              title={
+                connection?.in_used_by === 1
+                  ? 'You cannot action while this connection in used'
+                  : 'DELETE'
+              }
               onClick={() => confirmDelete()}>
               DELETE
             </DMSButton>

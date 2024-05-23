@@ -38,10 +38,11 @@ interface JobsTableProps {
 
 export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
+  const loading = useSelector((app: AppState) => app.migrationJob.loading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = React.useState(false);
+  // const [loading, setLoading] = React.useState(false);
   const [connectionList, setConnectionList] = React.useState<Connection[]>();
 
   const rowSelection = {
@@ -56,11 +57,9 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) =>
 
   const getConnectionList = async () => {
     try {
-      setLoading(true);
       const res = await getConnectionByProjectId(projectId);
       setConnectionList(res);
     } finally {
-      setLoading(false);
     }
   };
 
@@ -114,7 +113,6 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) =>
   }, []);
 
   if (loading) return <Loading />;
-
   return (
     <>
       <Table
