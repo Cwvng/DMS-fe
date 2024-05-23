@@ -49,6 +49,8 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa docker-compose.yaml ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:/home/liinhhnt/
           ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "sudo mv /home/liinhhnt/docker-compose.yaml /home/linhnt_ict/DMS-fe/"
+          scp -i ~/.ssh/id_rsa haproxy.cfg ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:/home/liinhhnt/
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "sudo mv /home/liinhhnt/haproxy.cfg /home/linhnt_ict/DMS-fe/"
 
       - name: SSH to GGC and pull new images
         run: |
