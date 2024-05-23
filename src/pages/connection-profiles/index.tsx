@@ -84,7 +84,7 @@ export const ConnectionProfiles: React.FC = () => {
   const renderDropdownMenu = (conn: Connection) => (
     <Menu
       items={
-        conn.in_used_by === '0'
+        conn.in_used_by === 0
           ? [
               {
                 label: <span>Test connection</span>,

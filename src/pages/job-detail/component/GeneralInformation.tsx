@@ -12,6 +12,8 @@ import { ConnectionProfileForm } from '../../../components/profile/ConnectionPro
 import { SideModal } from '../../../components/side-modal/SideModal.tsx';
 import { getConnectionDetail } from '../../../requests/connection.request.ts';
 import { Connection } from '../../../requests/types/connection.interface.ts';
+import { MigrationType } from '../../../constant';
+import { FaX } from 'react-icons/fa6';
 
 export const GeneralInformation: React.FC = () => {
   const { id } = useParams();
@@ -87,13 +89,13 @@ export const GeneralInformation: React.FC = () => {
                         defaultValue={jobDetail.job_type}
                         options={[
                           {
-                            value: 'One-time migration',
+                            value: MigrationType.ONE_TIME_MIGRATION,
                             label: 'One-time migration',
                             title:
                               'Contain full dump & load existing data to destination database (only fulldump phase)'
                           },
                           {
-                            value: 'Continuous migration',
+                            value: MigrationType.CONTINUOUS_MIGRATION,
                             label: 'Continuous migration',
                             title:
                               'Contain full dump & load existing data (fulldump phase) and capture incremental data to destination database (CDC phase)'
@@ -111,12 +113,16 @@ export const GeneralInformation: React.FC = () => {
             </Col>
             <Col className="mt-2" span={1}>
               {edit ? (
-                <FaCheck
-                  className="text-primary text-xl hover:cursor-pointer"
-                  onClick={() => {
-                    form.submit();
-                  }}
-                />
+                <div className="flex gap-2 w-[100px]">
+                  <FaX
+                    className="text-primary text-xxl hover:cursor-pointer"
+                    onClick={() => setEdit(false)}
+                  />
+                  <FaCheck
+                    className="text-primary text-xxl hover:cursor-pointer"
+                    onClick={() => form.submit()}
+                  />
+                </div>
               ) : (
                 <FaEdit
                   className="text-primary text-xl hover:cursor-pointer"

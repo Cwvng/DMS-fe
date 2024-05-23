@@ -42,3 +42,9 @@ export interface TestConnectionBody {
   password: string;
   engine: string;
 }
+
+export interface ActionJobBody {
+  status: string;
+  phase?: string;
+  action?: string;
+}

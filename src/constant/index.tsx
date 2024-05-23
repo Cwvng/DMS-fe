@@ -20,3 +20,7 @@ export enum Phase {
   CDC = 'cdc',
   NONE = 'none'
 }
+export enum MigrationType {
+  ONE_TIME_MIGRATION = 'one time migration',
+  CONTINUOUS_MIGRATION = 'continuous migration'
+}

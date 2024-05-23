@@ -7,6 +7,7 @@ import { useDispatch } from '../../../../../redux/store';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
+import { MigrationType } from '../../../../../constant';
 
 interface GetStartedProps {
   form: FormInstance<CreateJobBody>;
@@ -40,13 +41,13 @@ export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
             defaultValue={form.getFieldValue('job_type')}
             options={[
               {
-                value: 'One-time migration',
-                label: 'One-time migration',
+                value: MigrationType.ONE_TIME_MIGRATION,
+                label: 'One time migration',
                 title:
                   'Contain full dump & load existing data to destination database (only fulldump phase)'
               },
               {
-                value: 'Continuous migration',
+                value: MigrationType.CONTINUOUS_MIGRATION,
                 label: 'Continuous migration',
                 title:
                   'Contain full dump & load existing data (fulldump phase) and capture incremental data to destination database (CDC phase)'
@@ -85,11 +86,7 @@ export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
         open={openModal}
         onOk={() => setOpenModal(false)}
         onCancel={() => setOpenModal(false)}
-        footer={
-          <Button type="primary" onClick={() => setOpenModal(false)}>
-            Close
-          </Button>
-        }>
+        footer={null}>
         <MySQLInfo />
       </SideModal>
     </>

@@ -7,7 +7,7 @@ export interface Connection {
   username: string;
   password: string;
   engine: string;
-  in_used_by: string;
+  in_used_by: number;
 }
 export interface CreateConnectionBody {
   name: string;
