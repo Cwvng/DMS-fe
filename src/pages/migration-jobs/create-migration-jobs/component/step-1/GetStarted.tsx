@@ -1,51 +1,56 @@
 import React from 'react';
 import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput.tsx';
-import { Button, Card, Col, Form, FormProps, Row } from 'antd';
+import { Button, Card, Col, Form, FormInstance, Row } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
 import { MySQLInfo } from './MySQLInfo.tsx';
 import { useDispatch } from '../../../../../redux/store';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
-import { useForm } from 'antd/es/form/Form';
-import { useMigrationJobContext } from '../../index.tsx';
+import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
 
-export const GetStarted: React.FC = () => {
+interface GetStartedProps {
+  form: FormInstance<CreateJobBody>;
+}
+export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
   const [openModal, setOpenModal] = React.useState(false);
 
   const dispatch = useDispatch();
-  const [form] = useForm();
-  const { setType, setName, name, type } = useMigrationJobContext();
-  const saveForm: FormProps['onFinish'] = (values) => {
-    setType(values.type);
-    setName(values.name);
-    dispatch(updateStep(1));
-  };
   return (
     <>
-      <div className="text-lg font-bold mb-5 "> Describe your migration jobs</div>
-      <Form form={form} onFinish={saveForm}>
-        <Form.Item initialValue={name} name="name" rules={[{ required: true }]}>
+      <div className="text-lg font-bold mb-5 text-primary "> Describe your migration jobs</div>
+      <Form form={form} className="flex flex-col gap-2">
+        <Form.Item name="name" rules={[{ required: true }]}>
           <FloatLabelInput label="Migration job name" />
         </Form.Item>
         <Form.Item name="engine">
-          <FloatLabelSelect
-            label="Source database engine"
-            defaultValue="MySQL"
-            options={[{ value: 'MySQL', label: 'MySQL' }]}
-          />
-          <i className="p-2 text-xs font-medium">
-            By default, destination database must have the same database engine as source database
-          </i>
+          <>
+            <FloatLabelSelect
+              label="Source database engine"
+              defaultValue="MySQL"
+              options={[{ value: 'MySQL', label: 'MySQL' }]}
+            />
+            <i className="p-2 text-xs font-medium">
+              By default, destination database must have the same database engine as source database
+            </i>
+          </>
         </Form.Item>
-        <Form.Item name="type">
+        <Form.Item name="job_type" rules={[{ required: true }]}>
           <FloatLabelSelect
             label="Migration job type"
-            value={type}
-            defaultValue={type}
-            onChange={(value) => setType(value)}
+            defaultValue={form.getFieldValue('job_type')}
             options={[
-              { value: 'One-time migration', label: 'One-time migration' },
-              { value: 'Continuous migration', label: 'Continuous migration' }
+              {
+                value: 'One-time migration',
+                label: 'One-time migration',
+                title:
+                  'Contain full dump & load existing data to destination database (only fulldump phase)'
+              },
+              {
+                value: 'Continuous migration',
+                label: 'Continuous migration',
+                title:
+                  'Contain full dump & load existing data (fulldump phase) and capture incremental data to destination database (CDC phase)'
+              }
             ]}
           />
         </Form.Item>
@@ -64,7 +69,13 @@ export const GetStarted: React.FC = () => {
           </Row>
         </Card>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="mt-5">
+          <Button
+            type="primary"
+            onClick={async () => {
+              await form.validateFields();
+              dispatch(updateStep(1));
+            }}
+            className="mt-5">
             SAVE & CONTINUE
           </Button>
         </Form.Item>

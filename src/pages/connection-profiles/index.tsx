@@ -130,9 +130,6 @@ export const ConnectionProfiles: React.FC = () => {
   useEffect(() => {
     getAllConnectionList();
   }, []);
-  useEffect(() => {
-    getAllConnectionList();
-  }, [openModal]);
 
   return (
     <>
@@ -146,15 +143,17 @@ export const ConnectionProfiles: React.FC = () => {
               icon={<FaPlusSquare />}
               type="text"
               title="CREATE PROFILE"
-              onClick={() => setOpenModal(true)}
-            />
+              onClick={() => setOpenModal(true)}>
+              CREATE PROFILE
+            </DMSButton>
             {selectedRow && selectedRow.length > 0 && (
               <DMSButton
                 icon={<FaTrash />}
                 type="text"
                 title="DELETE"
-                onClick={() => confirmDelete(selectedRow[0].conn_id)}
-              />
+                onClick={() => confirmDelete(selectedRow[0].conn_id)}>
+                DELETE
+              </DMSButton>
             )}
           </div>
         </Col>
@@ -162,9 +161,6 @@ export const ConnectionProfiles: React.FC = () => {
       <Row className="p-5">
         <div className="font-normal">
           Connection profiles represent all the info you need to connect to data source.{' '}
-          <span>
-            <a>Learn more</a>
-          </span>
         </div>
       </Row>
       <div className="px-5">
@@ -231,7 +227,7 @@ export const ConnectionProfiles: React.FC = () => {
               dataIndex: 'port'
             },
             {
-              title: 'Action',
+              title: 'Actions',
               key: 'action',
               dataIndex: 'conn_id',
               align: 'center',
@@ -264,13 +260,14 @@ export const ConnectionProfiles: React.FC = () => {
         open={openModal}
         onCancel={() => setOpenModal(false)}
         footer={[
+          <Button onClick={() => setOpenModal(false)}>Cancel</Button>,
           <Button type="primary" form="myForm" key="submit" htmlType="submit">
             Submit
           </Button>
         ]}
         okText="CREATE"
         cancelText="CANCEL">
-        <ConnectionProfileForm closeModal={() => setOpenModal(false)} />
+        <ConnectionProfileForm id="myForm" closeModal={() => setOpenModal(false)} />
       </SideModal>
     </>
   );

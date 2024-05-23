@@ -1,22 +1,31 @@
 import { PageHeader } from '../../components/page-header/PageHeader.tsx';
 import React, { useEffect } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaCheck, FaEdit, FaTrash } from 'react-icons/fa';
 import { DMSButton } from '../../components/button/DMSButton.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { deleteConnection, getConnectionDetail } from '../../requests/connection.request.ts';
+import {
+  deleteConnection,
+  getConnectionDetail,
+  updateConnection
+} from '../../requests/connection.request.ts';
 import { AppState, useSelector } from '../../redux/store';
 import { Connection } from '../../requests/types/connection.interface.ts';
 import { Loading } from '../../components/loading/Loading.tsx';
-import { Col, Divider, message, Modal, Row } from 'antd';
+import { Col, Divider, Form, FormProps, Input, message, Modal, Row } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import { useForm } from 'antd/es/form/Form';
 
 export const ConnectionDetails: React.FC = () => {
   const { id } = useParams();
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const navigate = useNavigate();
+  const [form] = useForm();
 
   const [connection, setConnection] = React.useState<Connection>();
   const [loading, setLoading] = React.useState(false);
+  const [isUpdate, setIsUpdate] = React.useState(false);
+  const [edit, setEdit] = React.useState(false);
+  const [passwordVisible, setPasswordVisible] = React.useState(false);
 
   const getConnection = async () => {
     try {
@@ -56,39 +65,82 @@ export const ConnectionDetails: React.FC = () => {
     });
   };
 
+  const updateConnectionProfile: FormProps['onFinish'] = async (values) => {
+    try {
+      setIsUpdate(true);
+      if (connection?.conn_id) {
+        await updateConnection(projectId, connection.conn_id, values);
+        message.success('Updated successfully');
+        await getConnection();
+      }
+    } finally {
+      setIsUpdate(false);
+      setEdit(false);
+    }
+  };
+
   useEffect(() => {
     getConnection();
   }, []);
   if (loading) return <Loading />;
+  if (!connection) return;
   return (
     <>
       <PageHeader
         title="Connection profile detail"
         button={
           <>
-            <DMSButton
-              disabled={connection?.in_used_by === '0'}
-              icon={<FaEdit />}
-              type="text"
-              title="EDIT"
-            />
+            {edit ? (
+              <DMSButton
+                disabled={connection?.in_used_by === '0'}
+                icon={<FaCheck />}
+                onClick={form.submit}
+                type="text"
+                loading={isUpdate}
+                title={
+                  connection?.in_used_by === '0'
+                    ? 'You cannot action while this connection in used'
+                    : 'SAVE'
+                }>
+                SAVE
+              </DMSButton>
+            ) : (
+              <DMSButton
+                disabled={connection?.in_used_by === '0'}
+                icon={<FaEdit />}
+                onClick={() => setEdit(true)}
+                type="text"
+                title={
+                  connection?.in_used_by === '0'
+                    ? 'You cannot action while this connection in used'
+                    : 'EDIT'
+                }>
+                EDIT
+              </DMSButton>
+            )}
+
             <DMSButton
               icon={<FaTrash />}
               type="text"
               title="DELETE"
-              onClick={() => confirmDelete()}
-            />
+              onClick={() => confirmDelete()}>
+              DELETE
+            </DMSButton>
           </>
         }
       />
-      <div className="w-1/2 p-5">
-        <Row className="flex justify-between my-1">
-          <Col>Connection profile name</Col>
-          <Col>
-            <span className="font-medium">{connection?.name}</span>
-          </Col>
-        </Row>
-        <Divider className="m-0" />
+      <Form
+        form={form}
+        initialValues={{
+          name: connection?.name,
+          host: connection?.host,
+          engine: connection?.engine,
+          port: connection?.port,
+          username: connection?.username,
+          password: connection?.password
+        }}
+        onFinish={updateConnectionProfile}
+        className="w-1/2 p-5">
         <Row className="flex justify-between my-1">
           <Col>Connection profile id</Col>
           <Col>
@@ -96,34 +148,89 @@ export const ConnectionDetails: React.FC = () => {
           </Col>
         </Row>
         <Divider className="m-0" />
-        <Row className="flex justify-between my-1">
-          <Col>Database engine</Col>
+        <Row className="flex justify-between items-center my-1">
+          <Col>Connection profile name</Col>
           <Col>
-            <span className="font-medium">{connection?.engine}</span>
+            {edit ? (
+              <Form.Item className="m-0" name="name">
+                <Input />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.name}</span>
+            )}
           </Col>
         </Row>
         <Divider className="m-0" />
         <Row className="flex justify-between my-1">
+          <Col>Database engine</Col>
+          <Col>
+            {edit ? (
+              <Form.Item className="m-0" name="engine">
+                <Input />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.engine}</span>
+            )}
+          </Col>
+        </Row>
+        <Divider className="m-0" />
+        <Row className="flex justify-between items-center my-1">
           <Col>Host name or IP address</Col>
           <Col>
-            <span className="font-medium">{connection?.host}</span>
+            {edit ? (
+              <Form.Item className="m-0" name="host">
+                <Input />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.host}</span>
+            )}
           </Col>
         </Row>
         <Divider className="m-0" />
         <Row className="flex justify-between my-1">
           <Col>Port</Col>
           <Col>
-            <span className="font-medium">{connection?.port}</span>
+            {edit ? (
+              <Form.Item className="m-0" name="port">
+                <Input />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.port}</span>
+            )}
           </Col>
         </Row>
         <Divider className="m-0" />
         <Row className="flex justify-between my-1">
           <Col>Username</Col>
           <Col>
-            <span className="font-medium">{connection?.username}</span>
+            {edit ? (
+              <Form.Item className="m-0" name="username">
+                <Input />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.username}</span>
+            )}
           </Col>
         </Row>
-      </div>
+        <Row className="flex justify-between my-1">
+          <Col>Password</Col>
+          <Col>
+            {edit ? (
+              <Form.Item className="m-0" name="password">
+                <Input.Password
+                  className="w-[182px]"
+                  visibilityToggle={{
+                    visible: passwordVisible,
+                    onVisibleChange: setPasswordVisible
+                  }}
+                />
+              </Form.Item>
+            ) : (
+              <span className="font-medium">{connection?.password.replace(/./g, '•')}</span>
+            )}
+          </Col>
+        </Row>
+      </Form>
 
       <h4 className="p-5">
         In used by <span className="text-primary">{connection?.in_used_by}</span> migration jobs

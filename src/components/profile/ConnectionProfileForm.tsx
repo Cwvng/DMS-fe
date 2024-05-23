@@ -10,10 +10,12 @@ import { CreateConnectionBody, Connection } from '../../requests/types/connectio
 interface ConnectionProfileFormProps {
   closeModal: () => void;
   initialValue?: Connection;
+  id: string;
 }
 export const ConnectionProfileForm: React.FC<ConnectionProfileFormProps> = ({
   closeModal,
-  initialValue
+  initialValue,
+  id
 }) => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const [form] = useForm();
@@ -28,8 +30,8 @@ export const ConnectionProfileForm: React.FC<ConnectionProfileFormProps> = ({
 
       await createConnection(projectId, body);
       message.success('Created new connections');
-      closeModal();
     } finally {
+      closeModal();
     }
   };
 
@@ -38,9 +40,9 @@ export const ConnectionProfileForm: React.FC<ConnectionProfileFormProps> = ({
       if (initialValue?.conn_id) {
         await updateConnection(projectId, initialValue.conn_id, values);
         message.success('Updated successfully');
-        closeModal();
       }
     } finally {
+      closeModal();
     }
   };
   return (
@@ -48,18 +50,17 @@ export const ConnectionProfileForm: React.FC<ConnectionProfileFormProps> = ({
       <div>
         Connection profile represent the information required to connect to a data location. Choose
         a database engine and the details needed for that type of connection profile appear{' '}
-        <a>Learn more</a>
       </div>
 
       <Form
         initialValues={{
           name: initialValue?.name,
           host: initialValue?.host,
-          port: initialValue?.port,
+          port: initialValue?.port || '3306',
           username: initialValue?.username,
           password: initialValue?.password
         }}
-        id="myForm"
+        id={id}
         form={form}
         onFinish={initialValue ? updateSelectedConnection : createNewConnection}
         className="mt-5">

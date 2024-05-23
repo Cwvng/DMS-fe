@@ -14,9 +14,13 @@ export const DataTable: React.FC<ProfileProps> = ({ data, tableInfo }) => {
         <React.Fragment key={index}>
           {index !== 0 && <Divider className="m-0" />}
           <Row className="flex justify-between my-1">
-            <Col>{item.label}</Col>
+            <Col className="font-normal">{item.label}</Col>
             <Col>
-              <span className="font-medium">{item.key.split(' ').map((k) => data[k] + ' ')}</span>
+              <span className="font-normal">
+                {item.key.split(' ').length > 1
+                  ? data[item.key.split(' ')[0]] + ': ' + data[item.key.split(' ')[1]]
+                  : data[item.key]}
+              </span>
             </Col>
           </Row>
         </React.Fragment>
