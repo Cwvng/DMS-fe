@@ -14,7 +14,7 @@ export const FloatLabelInput: React.FC<FloatLabelInputProps> = (props) => {
   const isOccupied = focus || value !== ' ';
 
   const labelClass = isOccupied
-    ? 'absolute left-3 -top-3 text-sm bg-white px-1 ml-[-4px] text-primary transition-all duration-200 z-40'
+    ? 'absolute left-3 -top-3 text-sm bg-white px-1 ml-[-4px] transition-all duration-200 z-40'
     : 'absolute left-3 top-2.5 text-gray transition-all duration-200 pointer-events-none';
 
   const requiredMark = required ? <span className="text-red-500">*</span> : null;

@@ -5,8 +5,8 @@ import { useParams } from 'react-router-dom';
 import { AppState, useSelector } from '../../../redux/store';
 import { getJobById, updateJob } from '../../../requests/job.request.ts';
 import { Loading } from '../../../components/loading/Loading.tsx';
-import { Button, Col, Form, FormProps, Input, message, Row } from 'antd';
-import { FaEdit } from 'react-icons/fa';
+import { Button, Col, Divider, Form, FormProps, Input, message, Row, Select } from 'antd';
+import { FaCheck, FaEdit } from 'react-icons/fa';
 import { useForm } from 'antd/es/form/Form';
 import { ConnectionProfileForm } from '../../../components/profile/ConnectionProfileForm.tsx';
 import { SideModal } from '../../../components/side-modal/SideModal.tsx';
@@ -24,17 +24,17 @@ export const GeneralInformation: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [editSrc, setEditSrc] = React.useState(false);
   const [editTar, setEditTar] = React.useState(false);
-  const [editName, setEditName] = React.useState(false);
+  const [edit, setEdit] = React.useState(false);
 
-  const updateJobName: FormProps['onFinish'] = async (values) => {
+  const updateJobDetail: FormProps['onFinish'] = async (values) => {
     try {
       if (id) {
-        await updateJob(projectId, id, { name: values.name });
+        await updateJob(projectId, id, values);
         message.success('Updated successfully');
         await getJobDetailById();
       }
     } finally {
-      setEditName(false);
+      setEdit(false);
     }
   };
 
@@ -62,91 +62,145 @@ export const GeneralInformation: React.FC = () => {
   if (jobDetail)
     return (
       <div className="w-1/2 flex flex-col gap-3">
-        <div>
-          <Row className="flex justify-between my-1">
-            <Col>Migration job name</Col>
-            <Form form={form} onFinish={updateJobName}>
-              <Col className="flex items-center gap-2">
-                {editName ? (
-                  <Form.Item className="m-0" name="name" initialValue={jobDetail.name}>
-                    <Input onBlur={() => setEditName(false)} />
-                  </Form.Item>
-                ) : (
-                  <>
-                    <FaEdit
-                      onClick={() => setEditName(true)}
-                      className="text-primary hover:cursor-pointer opacity-0 hover:opacity-100"
-                    />
-                    <span className="font-medium">{jobDetail.name}</span>
-                  </>
-                )}
-              </Col>
-            </Form>
-          </Row>
-          <Row className="flex justify-between my-1">
-            <Col>Migration job type</Col>
-            <Col>
-              <span className="font-medium">{jobDetail.job_type}</span>
+        <Form form={form} onFinish={updateJobDetail}>
+          <Row className="flex justify-between">
+            <Col span={22}>
+              <Row className="flex justify-between my-1">
+                <Col className="font-normal">Migration job name</Col>
+                <Col className="flex items-center gap-2">
+                  {edit ? (
+                    <Form.Item className="m-0" name="name" initialValue={jobDetail.name}>
+                      <Input />
+                    </Form.Item>
+                  ) : (
+                    <span className="font-normal">{jobDetail.name}</span>
+                  )}
+                </Col>
+              </Row>
+              <Divider className="m-1" />
+              <Row className="flex justify-between my-1">
+                <Col className="font-normal">Migration job type</Col>
+                <Col>
+                  {edit ? (
+                    <Form.Item name="job_type">
+                      <Select
+                        defaultValue={jobDetail.job_type}
+                        options={[
+                          {
+                            value: 'One-time migration',
+                            label: 'One-time migration',
+                            title:
+                              'Contain full dump & load existing data to destination database (only fulldump phase)'
+                          },
+                          {
+                            value: 'Continuous migration',
+                            label: 'Continuous migration',
+                            title:
+                              'Contain full dump & load existing data (fulldump phase) and capture incremental data to destination database (CDC phase)'
+                          }
+                        ]}
+                      />
+                    </Form.Item>
+                  ) : (
+                    <span className="font-normal">
+                      {jobDetail.job_type.charAt(0).toUpperCase() + jobDetail.job_type.slice(1)}
+                    </span>
+                  )}
+                </Col>
+              </Row>
+            </Col>
+            <Col className="mt-2" span={1}>
+              {edit ? (
+                <FaCheck
+                  className="text-primary text-xl hover:cursor-pointer"
+                  onClick={() => {
+                    form.submit();
+                  }}
+                />
+              ) : (
+                <FaEdit
+                  className="text-primary text-xl hover:cursor-pointer"
+                  onClick={() => setEdit(true)}
+                />
+              )}
             </Col>
           </Row>
-        </div>
-        <div>
-          <div className="flex justify-between items-center text-center">
-            <h4 className="text-secondary">Source connection profile</h4>
+        </Form>
+        <Row className="flex justify-between">
+          <Col span={22}>
+            <h4 className="m-0 mt-3 text-secondary">Source connection profile</h4>
+            <DataTable
+              data={srcDetail}
+              tableInfo={[
+                { label: 'Database engine', key: 'engine' },
+                { label: 'Connection profile name', key: 'name' },
+                { label: 'Hostname:Port', key: 'host port' }
+              ]}
+            />
+          </Col>
+          <Col className="mt-5" span={1}>
             <FaEdit
               onClick={() => setEditSrc(true)}
-              className="text-primary text-xl hover:cursor-pointer opacity-0 hover:opacity-100"
+              className="text-primary text-xl hover:cursor-pointer"
             />
-          </div>
-          <DataTable
-            data={srcDetail}
-            tableInfo={[
-              { label: 'Database engine', key: 'engine' },
-              { label: 'Connection profile name', key: 'name' },
-              { label: 'Hostname:Port', key: 'host port' }
-            ]}
-          />
-        </div>
-        <div>
-          <div className="flex justify-between items-center text-center">
-            <h4 className="text-secondary">Destination connection profile</h4>
+          </Col>
+        </Row>
+        <Row className="flex justify-between">
+          <Col span={22}>
+            <h4 className="m-0 mt-3 text-secondary">Destination connection profile</h4>
+            <DataTable
+              data={tarDetail}
+              tableInfo={[
+                { label: 'Database engine', key: 'engine' },
+                { label: 'Connection profile name', key: 'name' },
+                { label: 'Hostname:Port', key: 'host port' }
+              ]}
+            />
+          </Col>
+          <Col className="mt-5" span={1}>
             <FaEdit
               onClick={() => setEditTar(true)}
-              className="text-primary text-xl hover:cursor-pointer opacity-0 hover:opacity-100"
+              className="text-primary text-xl hover:cursor-pointer "
             />
-          </div>
-          <DataTable
-            data={tarDetail}
-            tableInfo={[
-              { label: 'Database engine', key: 'engine' },
-              { label: 'Connection profile name', key: 'name' },
-              { label: 'Hostname:Port', key: 'host port' }
-            ]}
-          />
-        </div>
+          </Col>
+        </Row>
         <SideModal
-          title={<div className="font-semibold text-xl">Create connection profile</div>}
+          title={<div className="font-semibold text-xl">Edit connection profile</div>}
           open={editSrc}
           onCancel={() => setEditSrc(false)}
           footer={[
             <Button onClick={() => setEditSrc(false)}>Cancel</Button>,
-            <Button type="primary" form="myForm" key="submit" htmlType="submit">
+            <Button type="primary" form="srcForm" key="submit" htmlType="submit">
               Update
             </Button>
           ]}>
-          <ConnectionProfileForm initialValue={srcDetail} closeModal={() => setEditSrc(false)} />
+          <ConnectionProfileForm
+            initialValue={srcDetail}
+            closeModal={() => {
+              setEditTar(false);
+              getJobDetailById();
+            }}
+            id="srcForm"
+          />
         </SideModal>
         <SideModal
-          title={<div className="font-semibold text-xl">Create connection profile</div>}
+          title={<div className="font-semibold text-xl">Edit connection profile</div>}
           open={editTar}
           onCancel={() => setEditTar(false)}
           footer={[
             <Button onClick={() => setEditTar(false)}>Cancel</Button>,
-            <Button type="primary" form="myForm" key="submit" htmlType="submit">
+            <Button type="primary" form="tarForm" key="submit" htmlType="submit">
               Update
             </Button>
           ]}>
-          <ConnectionProfileForm initialValue={tarDetail} closeModal={() => setEditTar(false)} />
+          <ConnectionProfileForm
+            initialValue={tarDetail}
+            closeModal={() => {
+              setEditTar(false);
+              getJobDetailById();
+            }}
+            id="tarForm"
+          />
         </SideModal>
       </div>
     );

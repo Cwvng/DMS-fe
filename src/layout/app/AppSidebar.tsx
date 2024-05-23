@@ -43,13 +43,15 @@ export const AppSidebar: React.FC<SidebarProps> = ({ collapsed }) => {
     {
       key: '/',
       label: <span className="font-semibold ">Migration jobs</span>,
-      icon: <TfiMenuAlt />
+      icon: <TfiMenuAlt />,
+      onClick: () => navigate('/')
     },
 
     {
       key: '/connection-profiles',
       label: <span className="font-semibold ">Connection profiles</span>,
-      icon: <FaShareNodes />
+      icon: <FaShareNodes />,
+      onClick: () => navigate('/connection-profiles')
     }
   ];
 

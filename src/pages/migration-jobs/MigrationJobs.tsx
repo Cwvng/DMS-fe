@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Col, Row, Tabs, TabsProps } from 'antd';
+import { Col, message, Modal, Row, Tabs, TabsProps } from 'antd';
 import { DMSButton } from '../../components/button/DMSButton.tsx';
 import { FaPlay, FaPlusSquare, FaSquare, FaTrash } from 'react-icons/fa';
 import { BsBootstrapReboot } from 'react-icons/bs';
@@ -10,11 +10,15 @@ import { AppState, useDispatch, useSelector } from '../../redux/store';
 import { getJobList } from '../../redux/slices/migration-jobs.slice.ts';
 import { JobResponse } from '../../requests/types/job.interface.ts';
 import { JobStatus, Phase } from '../../constant';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { deleteJob } from '../../requests/job.request.ts';
 
 export const MigrationJobs: React.FC = () => {
   const navigate = useNavigate();
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
-  const jobs = useSelector((app: AppState) => app.migrationJob.jobList || []);
+  const jobs = useSelector((app: AppState) =>
+    (app.migrationJob.jobList || []).slice().sort((a, b) => a.name.localeCompare(b.name))
+  );
   const [selectedRow, setSelectedRow] = React.useState<JobResponse[]>();
 
   const dispatch = useDispatch();
@@ -31,6 +35,18 @@ export const MigrationJobs: React.FC = () => {
     }
   ];
 
+  const deleteSelectedJobs = async () => {
+    try {
+      if (selectedRow)
+        selectedRow.map(async (item) => {
+          await deleteJob(projectId, item.job_id);
+          message.success('Deleted successfully');
+          dispatch(getJobList(projectId));
+        });
+    } finally {
+    }
+  };
+
   useEffect(() => {
     dispatch(getJobList(projectId));
   }, [projectId]);
@@ -46,18 +62,23 @@ export const MigrationJobs: React.FC = () => {
               icon={<FaPlusSquare />}
               type="text"
               title="CREATE MIGRATION JOB"
-              onClick={() => navigate('/migration-jobs/create')}
-            />
+              onClick={() => navigate('/migration-jobs/create')}>
+              CREATE MIGRATION JOB
+            </DMSButton>
             <DMSButton
               disabled={
                 !selectedRow ||
                 selectedRow.length !== 1 ||
-                selectedRow[0]?.status !== JobStatus.NOT_STARTED
+                !(
+                  selectedRow[0]?.status === JobStatus.NOT_STARTED &&
+                  (selectedRow[0]?.source_id || selectedRow[0]?.target_id)
+                )
               }
               icon={<FaPlay />}
               type="text"
-              title="START"
-            />
+              title="START">
+              START
+            </DMSButton>
             <DMSButton
               disabled={
                 !selectedRow ||
@@ -71,8 +92,9 @@ export const MigrationJobs: React.FC = () => {
               }
               icon={<FaSquare />}
               type="text"
-              title="STOP"
-            />
+              title="STOP">
+              STOP
+            </DMSButton>
             <DMSButton
               disabled={
                 !selectedRow ||
@@ -86,8 +108,9 @@ export const MigrationJobs: React.FC = () => {
               }
               icon={<BsBootstrapReboot />}
               type="text"
-              title="RESUME"
-            />
+              title="RESUME">
+              RESUME
+            </DMSButton>
             <DMSButton
               disabled={
                 !selectedRow ||
@@ -101,8 +124,9 @@ export const MigrationJobs: React.FC = () => {
               }
               icon={<GrResume />}
               type="text"
-              title="RESTART"
-            />
+              title="RESTART">
+              RESTART
+            </DMSButton>
             <DMSButton
               disabled={
                 !selectedRow ||
@@ -110,15 +134,30 @@ export const MigrationJobs: React.FC = () => {
                 selectedRow[0]?.status === JobStatus.STOPPING
               }
               icon={<FaTrash />}
+              onClick={() => {
+                Modal.confirm({
+                  centered: true,
+                  title: 'Do you want to delete these items?',
+                  icon: <ExclamationCircleFilled />,
+                  onOk() {
+                    deleteSelectedJobs();
+                  },
+                  okText: 'Yes',
+                  cancelText: 'No',
+                  okButtonProps: { className: 'bg-primary' },
+                  cancelButtonProps: { className: 'border-primary text-primary' }
+                });
+              }}
               type="text"
-              title="DELETE"
-            />
+              title="DELETE">
+              DELETE
+            </DMSButton>
           </div>
         </Col>
       </Row>
       <Row className="p-5">
         <div className="font-normal">
-          Migration jobs allow you to move data from source to destination databases
+          Migration jobs allow you to move data from source to destination databases automatically
         </div>
       </Row>
       <div className="px-5">

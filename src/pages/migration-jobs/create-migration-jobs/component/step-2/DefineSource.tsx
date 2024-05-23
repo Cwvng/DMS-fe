@@ -1,4 +1,4 @@
-import { Button, Divider, Form, message } from 'antd';
+import { Button, Divider, Form, FormInstance, message, Skeleton } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import React, { useEffect } from 'react';
@@ -8,46 +8,82 @@ import { ConnectionProfileForm } from '../../../../../components/profile/Connect
 import { DataTable } from '../../../../../components/profile/DataTable.tsx';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 import { Connection } from '../../../../../requests/types/connection.interface.ts';
-import { useMigrationJobContext } from '../../index.tsx';
-import { testConnection } from '../../../../../requests/connection.request.ts';
+import {
+  getConnectionByProjectId,
+  getConnectionDetail,
+  testConnection
+} from '../../../../../requests/connection.request.ts';
+import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
+import { Loading } from '../../../../../components/loading/Loading.tsx';
 
-export const DefineSource: React.FC = () => {
-  const { setSrcId, connectionList } = useMigrationJobContext();
+interface DefineSourceProps {
+  form: FormInstance<CreateJobBody>;
+}
+export const DefineSource: React.FC<DefineSourceProps> = ({ form }) => {
   const projectId = useSelector((app) => app.migrationJob.projectId);
 
   const [openModal, setOpenModal] = React.useState(false);
+  const [isGetConnectionDetail, setIsGetConnectionDetail] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [selectedSrc, setSelectedSrc] = React.useState<Connection>(connectionList[0]);
+  const [isGetTarget, setIsGetTar] = React.useState(false);
+  const [selectedSrc, setSelectedSrc] = React.useState<Connection>();
+  const [connectionList, setConnectionList] = React.useState<Connection[]>();
 
-  useEffect(() => {
-    setSrcId(selectedSrc?.conn_id);
-  }, [selectedSrc]);
-
-  const testSelectedConnection = async () => {
+  const getConnectionList = async () => {
     try {
       setLoading(true);
-      const res = await testConnection(projectId, selectedSrc.conn_id, selectedSrc);
-      message.success(res.message);
+      const res = await getConnectionByProjectId(projectId);
+      setConnectionList(res);
     } finally {
       setLoading(false);
     }
   };
 
+  const testSelectedConnection = async () => {
+    try {
+      setIsGetConnectionDetail(true);
+      if (selectedSrc) {
+        await testConnection(projectId, selectedSrc.conn_id, selectedSrc);
+        message.success('Connect successfully');
+      }
+    } finally {
+      setIsGetConnectionDetail(false);
+    }
+  };
+  const getSelectedTarget = async () => {
+    try {
+      setIsGetTar(true);
+      if (form.getFieldValue('source_id')) {
+        const res = await getConnectionDetail(projectId, form.getFieldValue('source_id'));
+        setSelectedSrc(res);
+      }
+    } finally {
+      setIsGetTar(false);
+    }
+  };
+  useEffect(() => {
+    getSelectedTarget();
+    getConnectionList();
+  }, []);
+  if (loading) return <Loading />;
   if (connectionList)
     return (
       <>
-        <div className="text-lg font-bold "> Define your source</div>
+        <div className="text-lg font-bold text-primary "> Define your source</div>
         <div className="mt-3 font-medium">
           Your data source connection profile represents all the info needed to connect. Choose a
-          connection profile that already exist, or create a new one. <a>Learn more</a>
+          connection profile that already exist, or create a new one.
         </div>
-        <Form className="mt-10">
-          <Form.Item rules={[{ required: true, message: 'Source is required' }]}>
+        <Form form={form} className="mt-10">
+          <Form.Item
+            name="source_id"
+            rules={[{ required: true, message: 'Destination is required' }]}>
             <FloatLabelSelect
               label="Select source connection profile"
               optionFilterProp="children"
               showSearch
-              defaultValue={selectedSrc?.conn_id}
+              allowClear
+              defaultValue={form.getFieldValue('source_id')}
               filterOption={(input, option) => (option?.label ?? '').toString().includes(input)}
               filterSort={(optionA, optionB) =>
                 (optionA?.label ?? '')
@@ -55,10 +91,12 @@ export const DefineSource: React.FC = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? '').toString().toLowerCase())
               }
-              options={connectionList?.map((item) => ({
-                value: item.conn_id,
-                label: item.name
-              }))}
+              options={connectionList
+                ?.filter((item) => item.conn_id !== form.getFieldValue('target_id'))
+                .map((item) => ({
+                  value: item.conn_id,
+                  label: item.name
+                }))}
               dropdownRender={(menu) => (
                 <>
                   {menu}
@@ -78,14 +116,15 @@ export const DefineSource: React.FC = () => {
               }}
             />
           </Form.Item>
+          <Skeleton loading={isGetTarget} active />
           {selectedSrc && (
             <DataTable
               data={selectedSrc}
               tableInfo={[
                 { label: 'Connection profile name', key: 'name' },
                 { label: 'Hostname or IP address', key: 'host' },
-                { label: 'Username', key: 'username' },
-                { label: 'Port', key: 'port' }
+                { label: 'Port', key: 'port' },
+                { label: 'Username', key: 'username' }
               ]}
             />
           )}
@@ -96,17 +135,19 @@ export const DefineSource: React.FC = () => {
               source can connect to your destination
             </div>
             <Button
-              loading={loading}
+              loading={isGetConnectionDetail}
               onClick={() => testSelectedConnection()}
-              htmlType="submit"
-              className="mt-5 mr-3">
+              className="mt-5 mr-3"
+              disabled={!selectedSrc}>
               TEST CONNECTION
             </Button>
             <Button
               type="primary"
-              htmlType="submit"
               className="mt-5"
-              onClick={() => dispatch(updateStep(2))}>
+              onClick={async () => {
+                await form.validateFields();
+                dispatch(updateStep(2));
+              }}>
               SAVE & CONTINUE
             </Button>
           </Form.Item>
@@ -116,13 +157,19 @@ export const DefineSource: React.FC = () => {
           open={openModal}
           onCancel={() => setOpenModal(false)}
           footer={[
-            <Button type="primary" form="myForm" key="submit" htmlType="submit">
+            <Button type="primary" form="createSrcForm" key="submit" htmlType="submit">
               Submit
             </Button>
           ]}
           okText="CREATE"
           cancelText="CANCEL">
-          <ConnectionProfileForm closeModal={() => setOpenModal(false)} />
+          <ConnectionProfileForm
+            id="createSrcForm"
+            closeModal={() => {
+              setOpenModal(false);
+              getConnectionList();
+            }}
+          />
         </SideModal>
       </>
     );
