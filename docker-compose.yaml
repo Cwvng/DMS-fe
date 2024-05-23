@@ -40,9 +40,9 @@ services:
     networks:
       - haproxy-fe
 
-  haproxy:
+  haproxy-fe:
     image: haproxy:2.8.9
-    container_name: haproxy
+    container_name: haproxy-fe
     ports:
       - "3000:3000"
     volumes:
