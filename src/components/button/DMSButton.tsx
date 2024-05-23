@@ -6,12 +6,8 @@ export enum DMSButtonStyleType {
   TEXT = 'text'
 }
 
-type DMSButtonProps = ButtonProps & {
-  title: string;
-};
-
-export const DMSButton: React.FC<DMSButtonProps> = (props: DMSButtonProps) => {
-  const { title, type, ...others } = props;
+export const DMSButton: React.FC<ButtonProps> = (props: ButtonProps) => {
+  const { type, ...others } = props;
 
   const customStyle = useMemo(() => {
     switch (type) {
@@ -24,9 +20,5 @@ export const DMSButton: React.FC<DMSButtonProps> = (props: DMSButtonProps) => {
     }
   }, [type]);
 
-  return (
-    <Button className={customStyle} type={type} {...others}>
-      {title}
-    </Button>
-  );
+  return <Button className={customStyle} type={type} {...others} />;
 };

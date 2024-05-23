@@ -1,33 +1,32 @@
 import React, { useEffect } from 'react';
 import { DataTable } from '../../../../../components/profile/DataTable.tsx';
-import { Button, message, Modal, Skeleton } from 'antd';
+import { Button, Form, FormInstance, FormProps, message, Modal, Skeleton } from 'antd';
 import { IoIosWarning } from 'react-icons/io';
 import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
 import { createJob } from '../../../../../requests/job.request.ts';
 import { AppState, useDispatch, useSelector } from '../../../../../redux/store';
 import { useNavigate } from 'react-router-dom';
 import { getConnectionDetail } from '../../../../../requests/connection.request.ts';
-import { useMigrationJobContext } from '../../index.tsx';
 import { Connection } from '../../../../../requests/types/connection.interface.ts';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
-
-export const TestAndCreate: React.FC = () => {
+interface TestAndCreateProps {
+  form: FormInstance<CreateJobBody>;
+}
+export const TestAndCreate: React.FC<TestAndCreateProps> = ({ form }) => {
   const projectId = useSelector((app: AppState) => app.migrationJob.projectId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { name, type, srcId, tarId } = useMigrationJobContext();
 
   const [openModal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [connectionLoading, setConnectionLoading] = React.useState(false);
-  const [data, setData] = React.useState<CreateJobBody>();
   const [srcDetail, setSrcDetail] = React.useState<Connection>();
   const [tarDetail, setTarDetail] = React.useState<Connection>();
 
-  const createMigrationJob = async () => {
+  const createMigrationJob: FormProps['onFinish'] = async () => {
     try {
       setLoading(true);
-      await createJob(projectId, data!);
+      await createJob(projectId, form.getFieldsValue(true));
       message.success('Created new migration job');
       dispatch(updateStep(0));
       navigate('/migration-jobs');
@@ -38,6 +37,8 @@ export const TestAndCreate: React.FC = () => {
   const getConnection = async () => {
     try {
       setConnectionLoading(true);
+      const tarId = form.getFieldValue('source_id');
+      const srcId = form.getFieldValue('target_id');
       if (tarId && srcId) {
         const srcRes = await getConnectionDetail(projectId, srcId);
         const tarRes = await getConnectionDetail(projectId, tarId);
@@ -50,85 +51,70 @@ export const TestAndCreate: React.FC = () => {
   };
 
   useEffect(() => {
-    setData({
-      name,
-      job_type: type,
-      source_id: srcId,
-      target_id: tarId
-    });
-  }, [name, type, srcId, tarId]);
-
-  useEffect(() => {
     getConnection();
   }, []);
 
   return (
     <>
-      <div className="text-lg font-bold ">Test and create your migration job</div>
+      <div className="text-lg font-bold text-primary">Test and create your migration job</div>
       <div className="mt-3 font-medium">
         Review the details you entered for this migration job, and make sure to test it before
-        creating. You can create this job without starting it, or start it immediately
+        creating.
       </div>
-      <div className="mt-5">
-        {data && data.name !== '' && (
-          <>
+      <Form form={form} onFinish={createMigrationJob} className="mt-5">
+        <>
+          <h4>Migration job</h4>
+          <DataTable
+            data={form.getFieldsValue(true)}
+            tableInfo={[
+              { label: 'Migration job name', key: 'name' },
+              { label: 'Job type', key: 'job_type' }
+            ]}
+          />
+          <Skeleton loading={connectionLoading} active />
+          <Skeleton loading={connectionLoading} active />
+          {srcDetail && (
             <>
-              <h4 className="text-secondary">Migration job</h4>
+              <h4>Source connection</h4>
               <DataTable
-                data={data}
+                data={srcDetail}
                 tableInfo={[
-                  { label: 'Migration job name', key: 'name' },
-                  { label: 'Job type', key: 'job_type' }
+                  { label: 'Source connection name', key: 'name' },
+                  { label: 'Source connection engine', key: 'engine' },
+                  { label: 'Hostname:Port', key: 'host port' }
                 ]}
               />
             </>
-            <Skeleton loading={connectionLoading} active />
-            <Skeleton loading={connectionLoading} active />
-            {srcDetail && (
-              <>
-                <h4 className="text-secondary">Source connection</h4>
-                <DataTable
-                  data={srcDetail}
-                  tableInfo={[
-                    { label: 'Source connection name', key: 'name' },
-                    { label: 'Source connection engine', key: 'engine' },
-                    { label: 'Hostname:Port', key: 'host port' }
-                  ]}
-                />
-              </>
-            )}
-            {tarDetail && (
-              <>
-                <h4 className="text-secondary">Destination connection</h4>
-                <DataTable
-                  data={tarDetail}
-                  tableInfo={[
-                    { label: 'Destination connection name', key: 'name' },
-                    { label: 'Destination connection engine', key: 'engine' },
-                    { label: 'Hostname:Port', key: 'host port' }
-                  ]}
-                />
-              </>
-            )}
-          </>
-        )}
-      </div>
+          )}
+          {tarDetail && (
+            <>
+              <h4>Destination connection</h4>
+              <DataTable
+                data={tarDetail}
+                tableInfo={[
+                  { label: 'Destination connection name', key: 'name' },
+                  { label: 'Destination connection engine', key: 'engine' },
+                  { label: 'Hostname:Port', key: 'host port' }
+                ]}
+              />
+            </>
+          )}
+        </>
+      </Form>
 
       <div className="mt-5">
         <Button
           onClick={() => {
             navigate('/');
             dispatch(updateStep(0));
+            form.resetFields();
           }}
           className="mr-3">
           CANCEL
         </Button>
-        <Button loading={loading} onClick={createMigrationJob} className="mr-2" type="primary">
+        <Button loading={loading} onClick={form.submit} className="mr-2" type="primary">
           CREATE JOB
         </Button>
-        {/*<Button type="primary" onClick={() => setOpenModal(true)}>*/}
-        {/*  CREATE AND START JOB*/}
-        {/*</Button>*/}
       </div>
       <Modal
         title={<div className="font-semibold text-xl">Create & start migration job?</div>}

@@ -49,6 +49,10 @@ export const Tasks: React.FC = () => {
       title: 'Start time',
       dataIndex: 'startTime',
       key: 'startTime',
+      sorter: {
+        compare: (a: any, b: any) => a.startTime.localeCompare(b.startTime),
+        multiple: 1
+      },
       render: (text: string) => {
         const startTime = new Date(text);
         const formattedTime = startTime.toLocaleString('vi-VN', {
@@ -95,6 +99,7 @@ export const Tasks: React.FC = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (status) => {
         const color = getStatusTagColor(status);
         return (
@@ -103,6 +108,13 @@ export const Tasks: React.FC = () => {
           </Tag>
         );
       }
+    },
+    {
+      title: 'Message',
+      dataIndex: 'message',
+      key: 'message',
+      width: 200,
+      render: (message) => <span>{message}</span>
     }
   ];
   useEffect(() => {

@@ -15,9 +15,17 @@ import { Loading } from '../../../components/loading/Loading.tsx';
 const getStatusTagColor = (status: string): string => {
   switch (status.toLowerCase()) {
     case JobStatus.NOT_STARTED:
-      return 'geekblue';
+      return 'gray';
+    case JobStatus.RUNNING:
+      return 'blue';
+    case JobStatus.STOPPED:
+      return 'yellow';
+    case JobStatus.STOPPING:
+      return 'yellow';
     case JobStatus.FAILED:
-      return 'volcano';
+      return 'red';
+    case JobStatus.COMPLETED:
+      return 'green';
     default:
       return 'green';
   }
@@ -114,7 +122,7 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) =>
           type: 'checkbox',
           ...rowSelection
         }}
-        className="w-full"
+        className="w-full font-normal"
         columns={[
           {
             title: 'Migration job name',
@@ -168,8 +176,8 @@ export const JobsTable: React.FC<JobsTableProps> = ({ jobs, setSelectedRow }) =>
             )
           },
           {
-            title: 'Action',
-            key: 'action',
+            title: 'Actions',
+            key: 'actions',
             dataIndex: 'job_id',
             align: 'center',
             render: (_, record) => (

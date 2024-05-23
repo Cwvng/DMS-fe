@@ -14,7 +14,7 @@ export const FloatLabelSelect: React.FC<FloatLabelSelectProps> = (props) => {
   const isOccupied = focus || value !== '';
 
   const labelClass = isOccupied
-    ? 'absolute left-3 -top-3 text-sm bg-white px-1 ml-[-4px] !text-primary transition-all duration-200'
+    ? 'absolute left-3 -top-3 text-sm bg-white px-1 ml-[-4px]  transition-all duration-200'
     : 'absolute left-3 top-2.5 transition-all duration-200 pointer-events-none';
 
   return (
