@@ -37,8 +37,8 @@ export const TestAndCreate: React.FC<TestAndCreateProps> = ({ form }) => {
   const getConnection = async () => {
     try {
       setConnectionLoading(true);
-      const tarId = form.getFieldValue('source_id');
-      const srcId = form.getFieldValue('target_id');
+      const srcId = form.getFieldValue('source_id');
+      const tarId = form.getFieldValue('target_id');
       if (tarId && srcId) {
         const srcRes = await getConnectionDetail(projectId, srcId);
         const tarRes = await getConnectionDetail(projectId, tarId);

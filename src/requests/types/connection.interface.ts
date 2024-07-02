@@ -14,5 +14,6 @@ export interface CreateConnectionBody {
   host: string;
   username: string;
   password: string;
+  port?: string;
 }
 export type UpdateConnectionBody = Partial<Connection>;

@@ -2,18 +2,20 @@ import React from 'react';
 import { FloatLabelInput } from '../../../../../components/input/FloatLabelInput.tsx';
 import { Button, Card, Col, Form, FormInstance, Row } from 'antd';
 import { FloatLabelSelect } from '../../../../../components/input/FloatLabelSelect.tsx';
-import { MySQLInfo } from './MySQLInfo.tsx';
+import { SourceInfo } from './SourceInfo.tsx';
 import { useDispatch } from '../../../../../redux/store';
 import { updateStep } from '../../../../../redux/slices/migration-jobs.slice.ts';
 import { SideModal } from '../../../../../components/side-modal/SideModal.tsx';
 import { CreateJobBody } from '../../../../../requests/types/job.interface.ts';
 import { MigrationType } from '../../../../../constant';
+import { DestinationInfo } from './DestinationInfo.tsx';
 
 interface GetStartedProps {
   form: FormInstance<CreateJobBody>;
 }
 export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
-  const [openModal, setOpenModal] = React.useState(false);
+  const [openSource, setOpenSource] = React.useState(false);
+  const [openDestination, setOpenDestination] = React.useState(false);
 
   const dispatch = useDispatch();
   return (
@@ -56,7 +58,7 @@ export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
           />
         </Form.Item>
         <Card title="Before you continue, review the prerequisite" bordered className="shadow-lg">
-          <Row>
+          <Row className="flex items-center justify-between">
             <Col span={20}>
               <div>MySQL source</div>
               <span className="text-sm font-medium">
@@ -65,7 +67,19 @@ export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
               </span>
             </Col>
             <Col span={4}>
-              <Button onClick={() => setOpenModal(true)}>Open</Button>
+              <Button onClick={() => setOpenSource(true)}>Open</Button>
+            </Col>
+          </Row>
+          <Row className="mt-10 flex items-center justify-between">
+            <Col span={20}>
+              <div>MySQL destination</div>
+              <span className="text-sm font-medium">
+                For this migration job to be able to load data to MySQL, the database needs some
+                specific configuration.
+              </span>
+            </Col>
+            <Col span={4}>
+              <Button onClick={() => setOpenDestination(true)}>Open</Button>
             </Col>
           </Row>
         </Card>
@@ -83,11 +97,19 @@ export const GetStarted: React.FC<GetStartedProps> = ({ form }) => {
       </Form>
       <SideModal
         title={<div className="font-semibold text-xl">MySQL source</div>}
-        open={openModal}
-        onOk={() => setOpenModal(false)}
-        onCancel={() => setOpenModal(false)}
+        open={openSource}
+        onOk={() => setOpenSource(false)}
+        onCancel={() => setOpenSource(false)}
         footer={null}>
-        <MySQLInfo />
+        <SourceInfo />
+      </SideModal>
+      <SideModal
+        title={<div className="font-semibold text-xl">MySQL destination</div>}
+        open={openDestination}
+        onOk={() => setOpenDestination(false)}
+        onCancel={() => setOpenDestination(false)}
+        footer={null}>
+        <DestinationInfo />
       </SideModal>
     </>
   );
