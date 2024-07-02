@@ -25,7 +25,8 @@ export const ConnectionProfileForm: React.FC<ConnectionProfileFormProps> = ({
         name: values.name.trim(),
         host: values.host.trim(),
         username: values.username.trim(),
-        password: values.password.trim()
+        password: values.password.trim(),
+        port: values.port?.trim()
       };
 
       await createConnection(projectId, body);

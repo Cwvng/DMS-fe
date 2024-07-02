@@ -1,4 +1,4 @@
-export const MySQLInfo = () => {
+export const SourceInfo = () => {
   return (
     <div className="overflow-auto h-160">
       <div className="font-semibold">MySQL source</div>
@@ -73,7 +73,8 @@ export const MySQLInfo = () => {
         Learn more
       </a>
       <br />
-      All tables (except tables in system databases) use the InnoDB storage engine{' '}
+      All tables (except tables in system databases) use the InnoDB storage engine and have
+      primary/unique key{' '}
       <a target="_blank" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-storage-engine.html">
         Learn more about InnoDB
       </a>

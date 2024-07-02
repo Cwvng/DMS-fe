@@ -222,7 +222,8 @@ export const ConnectionDetails: React.FC = () => {
               <span className="font-medium">{connection?.username}</span>
             )}
           </Col>
-        </Row>
+        </Row>{' '}
+        <Divider className="m-0" />
         <Row className="flex justify-between my-1">
           <Col>Password</Col>
           <Col>
