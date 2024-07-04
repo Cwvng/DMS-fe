@@ -11,44 +11,46 @@ services:
       - /usr/src/app/node_modules
     restart: always
     command: npm run dev -- --host 0.0.0.0
-    networks:
-      - haproxy-fe
-
-  dms-fe-2:
-    image: liinhhnt/dms-fe
-    container_name: dms-fe-2
-    env_file:
-      - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    restart: always
-    command: npm run dev -- --host 0.0.0.0
-    networks:
-      - haproxy-fe
-
-  dms-fe-3:
-    image: liinhhnt/dms-fe
-    container_name: dms-fe-3
-    env_file:
-      - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    restart: always
-    command: npm run dev -- --host 0.0.0.0
-    networks:
-      - haproxy-fe
-
-  haproxy-fe:
-    image: haproxy:2.8.9
-    container_name: haproxy-fe
     ports:
       - "3000:3000"
-    volumes:
-      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-    networks:
-      - haproxy-fe
+  #   networks:
+  #     - haproxy-fe
+
+  # dms-fe-2:
+  #   image: liinhhnt/dms-fe
+  #   container_name: dms-fe-2
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   restart: always
+  #   command: npm run dev -- --host 0.0.0.0
+  #   networks:
+  #     - haproxy-fe
+
+  # dms-fe-3:
+  #   image: liinhhnt/dms-fe
+  #   container_name: dms-fe-3
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   restart: always
+  #   command: npm run dev -- --host 0.0.0.0
+  #   networks:
+  #     - haproxy-fe
+
+  # haproxy-fe:
+  #   image: haproxy:2.8.9
+  #   container_name: haproxy-fe
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  #   networks:
+  #     - haproxy-fe
 
 networks:
   haproxy-fe:
